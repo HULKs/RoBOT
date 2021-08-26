@@ -22,4 +22,5 @@ type ServerConf struct {
 	EveryoneRoleID       string `json:"EveryoneRoleID"`
 	ParticipantRoleID    string `json:"ParticipantRoleID"`
 	OrgaTeamRoleID       string `json:"OrgaTeamRoleID"`
+	BotAdminRoleID       string `json:"BotAdminRoleID"`
 }

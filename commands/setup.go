@@ -32,9 +32,14 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 	switch strings.ToLower(args[0]) {
 	case "bootstrap":
 		deleteChannelsAndRoles(s, g)
-		createParticipantRole(s, g)
-		createOrgaTeamRole(s, g)
+
+		util.CreateRole(
+			s, g, "Participant", "0x000000", 242769972800, false, false, &config.ServerConfig.ParticipantRoleID,
+		)
+		util.CreateRole(s, g, "Orga-Team", "0x9A58B4", 0, false, false, &config.ServerConfig.OrgaTeamRoleID)
+		util.CreateRole(s, g, "RoBOT-Admin", "0xFF0000", 0, false, true, &config.ServerConfig.BotAdminRoleID)
 		createTeamRoles(s, g)
+
 		createBasicChannels(s, g)
 
 		// TODO Create Teamzones
@@ -92,43 +97,11 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 	}
 }
 
-// createParticipantRole creates the "Participant" Role every member has
-func createParticipantRole(s *discordgo.Session, g *discordgo.Guild) {
-	// TODO Add logging
-	// Create Participant Role
-	participantRole, err := s.GuildRoleCreate(g.ID)
-	errors.Check(err, "Failed to create Role \"Participant\"")
-	// Add Participant Role ID to config
-	config.ServerConfig.ParticipantRoleID = participantRole.ID
-	// Edit Role, set name and permissions
-	_, err = s.GuildRoleEdit(g.ID, participantRole.ID, "Participant", 0, false, 242769972800, false)
-	errors.Check(err, "Failed to edit Role \"Participant\"")
-}
-
-func createOrgaTeamRole(s *discordgo.Session, g *discordgo.Guild) {
-	// TODO Add logging
-	// Create Orga-Team Role
-	orgaTeamRole, err := s.GuildRoleCreate(g.ID)
-	errors.Check(err, "Failed to create Role \"Orga-Team\"")
-	// Add Participant Role ID to config
-	config.ServerConfig.OrgaTeamRoleID = orgaTeamRole.ID
-	// Edit Role, set name and permissions
-	_, err = s.GuildRoleEdit(g.ID, orgaTeamRole.ID, "Orga-Team", util.ParseHexColor("0x9A58B4"), false, 0, false)
-	errors.Check(err, "Failed to edit Role \"Orga-Team\"")
-}
-
 // createTeamRoles creates the roles for the participating teams
 func createTeamRoles(s *discordgo.Session, g *discordgo.Guild) {
 	// TODO Add logging
 	for _, t := range config.TeamList {
-		// Create Participant Role
-		teamRole, err := s.GuildRoleCreate(g.ID)
-		errors.Check(err, "Failed to create Role \""+t.Name+"\"")
-		// Add Participant Role ID to config
-		t.RoleID = teamRole.ID
-		// Edit Role, set name and permissions
-		_, err = s.GuildRoleEdit(g.ID, t.RoleID, t.Name, util.ParseTeamColor(t), true, 0, true)
-		errors.Check(err, "Failed to edit Role \""+t.Name+"\"")
+		util.CreateRole(s, g, t.Name, t.TeamColor, 0, true, true, &t.RoleID)
 	}
 }
 
