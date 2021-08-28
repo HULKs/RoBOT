@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"log"
 	"strings"
 
 	"RoBOT/config"
@@ -31,14 +32,22 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 	switch strings.ToLower(args[0]) {
 	case "bootstrap":
+		// Delete everything on server
 		deleteChannelsAndRoles(s, g)
 
+		// Create Participant role
 		util.CreateRole(
 			s, g, "Participant", "0x000000", 242769972800, false, false, &config.ServerConfig.ParticipantRoleID,
 		)
+		// Create Orga-Team role
 		util.CreateRole(s, g, "Orga-Team", "0x9A58B4", 0, false, false, &config.ServerConfig.OrgaTeamRoleID)
+		// Create RoBOT-Admin role
 		util.CreateRole(s, g, "RoBOT-Admin", "0xFF0000", 0, false, true, &config.ServerConfig.BotAdminRoleID)
-		createTeamRoles(s, g)
+		// Create role for each team
+		log.Println("Creating roles for teams...")
+		for _, t := range config.TeamList {
+			util.CreateRole(s, g, t.Name, t.TeamColor, 0, true, true, &t.RoleID)
+		}
 
 		createBasicChannels(s, g)
 
@@ -89,19 +98,12 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 	roles, err := s.GuildRoles(g.ID)
 	for _, role := range roles {
 		if role.Name == "@everyone" || (strings.Contains(role.Name, "RoBOT") && role.Permissions == 8) {
+			// TODO Reset permissions for @everyone
 			continue
 		}
 		// Delete Role
 		err := s.GuildRoleDelete(g.ID, role.ID)
 		errors.Check(err, "Failed deleting role "+role.ID)
-	}
-}
-
-// createTeamRoles creates the roles for the participating teams
-func createTeamRoles(s *discordgo.Session, g *discordgo.Guild) {
-	// TODO Add logging
-	for _, t := range config.TeamList {
-		util.CreateRole(s, g, t.Name, t.TeamColor, 0, true, true, &t.RoleID)
 	}
 }
 
@@ -111,6 +113,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	_, err = s.GuildChannelCreate(g.ID, "welcome", 0)
 	errors.Check(err, "Failed to create welcome channel")
 	// TODO set as system channel
+	// TODO set permissions
 
 	// botcontrol
 	_, err = s.GuildChannelCreate(g.ID, "botcontrol", 0)
