@@ -27,10 +27,10 @@ func ParseTeamColor(name, hex string) int {
 	return int(tc)
 }
 
-func ParseHexColor(hex string) int {
+// ParseHexColor converts a hex RGB color of format "0x000000" code to an int
+func ParseHexColor(hex string) (int, error) {
 	i, err := strconv.ParseInt(hex, 0, 0)
-	errors.Check(err, "Failed to parse color from "+hex)
-	return int(i)
+	return int(i), err
 }
 
 // CreateRole creates a new role with the given properties
@@ -48,11 +48,15 @@ func CreateRole(
 	}
 	log.Printf("[%s] Saved ID to config", role.ID)
 
+	// Parse color
+	col, err := ParseHexColor(hexColor)
+	errors.Check(err, "Failed to parse color from "+hexColor+" for role "+name)
+
 	// Edit Role, set name and permissions
-	_, err = s.GuildRoleEdit(g.ID, role.ID, name, ParseHexColor(hexColor), hoist, perm, mention)
+	_, err = s.GuildRoleEdit(g.ID, role.ID, name, col, hoist, perm, mention)
 	errors.Check(err, "Failed to edit Role \""+name+"\"")
 	log.Printf(
-		"[%s] Edited Role (Name: %s, Color: %s, Perm: %d, Hoist: %t, Mention: %t)", role.ID, name, hexColor, perm,
-		hoist, mention,
+		"[%s] Edited Role (Name: %s, Color: %s, Perm: %d, Hoist: %t, Mention: %t)",
+		role.ID, name, hexColor, perm, hoist, mention,
 	)
 }
