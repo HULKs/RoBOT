@@ -23,4 +23,11 @@ type ServerConf struct {
 	ParticipantRoleID    string `json:"ParticipantRoleID"`
 	OrgaTeamRoleID       string `json:"OrgaTeamRoleID"`
 	BotAdminRoleID       string `json:"BotAdminRoleID"`
+	PermissionTemplates  struct {
+		Everyone    int64 `json:"Everyone"`
+		OrgaTeam    int64 `json:"Orga-Team"`
+		Participant int64 `json:"Participant"`
+		RoBOTAdmin  int64 `json:"RoBOT-Admin"`
+		TeamRole    int64 `json:"TeamRole"`
+	} `json:"PermissionTemplates"`
 }

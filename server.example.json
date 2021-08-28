@@ -1,3 +1,10 @@
 {
-  "EventName": "v-RoHOW 2021"
+  "EventName": "v-RoHOW 2021",
+  "PermissionTemplates": {
+	"Everyone": 0,
+	"Participant": 242769972800,
+	"TeamRole": 0,
+	"Orga-Team": 0,
+	"RoBOT-Admin": 0
+  }
 }

@@ -37,16 +37,30 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		// Create Participant role
 		util.CreateRole(
-			s, g, "Participant", "0x000000", 242769972800, false, false, &config.ServerConfig.ParticipantRoleID,
+			s, g, "Participant", "0x000000",
+			config.ServerConfig.PermissionTemplates.Participant,
+			false, false, &config.ServerConfig.ParticipantRoleID,
 		)
 		// Create Orga-Team role
-		util.CreateRole(s, g, "Orga-Team", "0x9A58B4", 0, false, false, &config.ServerConfig.OrgaTeamRoleID)
+		util.CreateRole(
+			s, g, "Orga-Team", "0x9A58B4",
+			config.ServerConfig.PermissionTemplates.OrgaTeam,
+			false, false, &config.ServerConfig.OrgaTeamRoleID,
+		)
 		// Create RoBOT-Admin role
-		util.CreateRole(s, g, "RoBOT-Admin", "0xFF0000", 0, false, true, &config.ServerConfig.BotAdminRoleID)
+		util.CreateRole(
+			s, g, "RoBOT-Admin", "0xFF0000",
+			config.ServerConfig.PermissionTemplates.RoBOTAdmin,
+			false, true, &config.ServerConfig.BotAdminRoleID,
+		)
 		// Create role for each team
 		log.Println("Creating roles for teams...")
 		for _, t := range config.TeamList {
-			util.CreateRole(s, g, t.Name, t.TeamColor, 0, true, true, &t.RoleID)
+			util.CreateRole(
+				s, g, t.Name, t.TeamColor,
+				config.ServerConfig.PermissionTemplates.TeamRole,
+				true, true, &t.RoleID,
+			)
 		}
 
 		createBasicChannels(s, g)
