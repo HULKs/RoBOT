@@ -40,13 +40,13 @@ func CreateRole(
 	// Create Role
 	role, err := s.GuildRoleCreate(g.ID)
 	errors.Check(err, "Failed to create Role \""+name+"\"")
-	log.Printf("[%s] Created Role", role.ID)
+	log.Printf("[%s] Created Role (%s)", role.ID, name)
 
 	// Add Role ID to config
 	if configRef != nil {
 		*configRef = role.ID
 	}
-	log.Printf("[%s] Saved ID to config", role.ID)
+	log.Printf("[%s] Saved ID to config (%s)", role.ID, name)
 
 	// Parse color
 	col, err := ParseHexColor(hexColor)
