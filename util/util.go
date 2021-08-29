@@ -61,3 +61,10 @@ func CreateRole(
 		role.ID, name, hexColor, perm, hoist, mention,
 	)
 }
+
+// CreateCategory creates a category with the given name and returns the channel struct
+func CreateCategory(s *discordgo.Session, g *discordgo.Guild, name string) *discordgo.Channel {
+	channel, err := s.GuildChannelCreate(g.ID, name, 4)
+	errors.Check(err, "Failed creating category "+name)
+	return channel
+}
