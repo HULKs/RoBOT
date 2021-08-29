@@ -35,7 +35,8 @@ func ParseHexColor(hex string) (int, error) {
 
 // CreateRole creates a new role with the given properties
 func CreateRole(
-	s *discordgo.Session, g *discordgo.Guild, name, hexColor string, perm int64, hoist, mention bool, configRef *string,
+	s *discordgo.Session, g *discordgo.Guild, name, hexColor string, perm int64,
+	hoist, mention bool, configRef *string,
 ) {
 	// Create Role
 	role, err := s.GuildRoleCreate(g.ID)
