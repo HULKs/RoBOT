@@ -38,6 +38,10 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		// Delete everything on server
 		deleteChannelsAndRoles(s, g)
 
+		// Set server-wide permissions for @everyone
+		_, err = s.GuildRoleEdit(g.ID, config.ServerConfig.EveryoneRoleID, "", 0, false, 0, true)
+		errors.Check(err, "Failed setting permissions for @everyone role")
+
 		// Create Participant role
 		util.CreateRole(
 			s, g, "Participant", "0x000000",
