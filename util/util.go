@@ -37,7 +37,7 @@ func ParseHexColor(hex string) (int, error) {
 func CreateRole(
 	s *discordgo.Session, g *discordgo.Guild, name, hexColor string, perm int64,
 	hoist, mention bool, configRef *string,
-) {
+) *discordgo.Role {
 	// Create Role
 	role, err := s.GuildRoleCreate(g.ID)
 	errors.Check(err, "Failed to create Role \""+name+"\"")
@@ -60,11 +60,45 @@ func CreateRole(
 		"[%s] Edited Role (Name: %s, Color: %s, Perm: %d, Hoist: %t, Mention: %t)",
 		role.ID, name, hexColor, perm, hoist, mention,
 	)
+
+	return role
 }
 
-// CreateCategory creates a category with the given name and returns the channel struct
-func CreateCategory(s *discordgo.Session, g *discordgo.Guild, name string) *discordgo.Channel {
-	channel, err := s.GuildChannelCreate(g.ID, name, 4)
+// CreateCategory creates a category with the given properties and returns the channel struct
+func CreateCategory(
+	s *discordgo.Session, g *discordgo.Guild, name, topic string, permissionOverwrites []*discordgo.PermissionOverwrite,
+) *discordgo.Channel {
+	// Create category
+	category, err := s.GuildChannelCreateComplex(
+		g.ID, discordgo.GuildChannelCreateData{
+			Name:                 name,
+			Type:                 discordgo.ChannelTypeGuildCategory,
+			Topic:                topic,
+			PermissionOverwrites: permissionOverwrites,
+		},
+	)
 	errors.Check(err, "Failed creating category "+name)
+	log.Printf("[%s] Created category: %s", category.ID, category.Name)
+
+	return category
+}
+
+// CreateChannel creates a channel with the given properties and returns the channel
+func CreateChannel(
+	s *discordgo.Session, g *discordgo.Guild, name, topic, parentID string, chtype discordgo.ChannelType,
+	permissionOverwrites []*discordgo.PermissionOverwrite,
+) *discordgo.Channel {
+	channel, err := s.GuildChannelCreateComplex(
+		g.ID, discordgo.GuildChannelCreateData{
+			Name:                 name,
+			Topic:                topic,
+			Type:                 chtype,
+			ParentID:             parentID,
+			PermissionOverwrites: permissionOverwrites,
+		},
+	)
+	errors.Check(err, "Failed creating channel "+name)
+	log.Printf("[%s] Created channel: %s", channel.ID, channel.Name)
+
 	return channel
 }
