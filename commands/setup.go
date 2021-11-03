@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -68,8 +69,10 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		createBasicChannels(s, g)
 
-		// TODO Create Teamzones
+		createTeamzones(s, g)
+
 		// TODO Create Magic Voice
+		// TODO Create Archive
 
 		config.SaveServerConfig()
 		config.SaveTeamConfig()
@@ -193,10 +196,18 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 		s, g, "Information", "", []*discordgo.PermissionOverwrite{
 			// Default permissions for @Participant
 			{
-				ID:    config.ServerConfig.ParticipantRoleID,
-				Type:  discordgo.PermissionOverwriteTypeRole,
-				Deny:  0,
+				ID:   config.ServerConfig.EveryoneRoleID,
+				Type: discordgo.PermissionOverwriteTypeRole,
+				Deny: discordgo.PermissionViewChannel |
+					discordgo.PermissionVoiceConnect,
 				Allow: 0,
+			},
+			{
+				ID:   config.ServerConfig.ParticipantRoleID,
+				Type: discordgo.PermissionOverwriteTypeRole,
+				Deny: 0,
+				Allow: discordgo.PermissionViewChannel |
+					discordgo.PermissionVoiceConnect,
 			},
 		},
 	)
@@ -213,4 +224,44 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 
 	// GENERAL: town-hall, Voice: Town-Hall, Lounge 01-02, AFK
 
+}
+
+func createTeamzones(s *discordgo.Session, g *discordgo.Guild) {
+	// Create role for each team
+	log.Println("Creating teamzones...")
+	for _, t := range config.TeamList {
+		// Create teamzone category
+		catTeamzone := util.CreateCategory(
+			s, g, t.Name, t.Name+" - Teamzone",
+			[]*discordgo.PermissionOverwrite{
+				{
+					ID:   config.ServerConfig.EveryoneRoleID,
+					Type: discordgo.PermissionOverwriteTypeRole,
+					Deny: discordgo.PermissionViewChannel |
+						discordgo.PermissionVoiceConnect,
+					Allow: 0,
+				},
+				{
+					ID:   t.RoleID,
+					Type: discordgo.PermissionOverwriteTypeRole,
+					Deny: 0,
+					Allow: discordgo.PermissionViewChannel |
+						discordgo.PermissionVoiceConnect |
+						discordgo.PermissionManageChannels,
+				},
+			},
+		)
+		// Create text channel
+		util.CreateChannel(
+			s, g, t.Name, t.Name+" - Teamzone", catTeamzone.ID,
+			discordgo.ChannelTypeGuildText, nil,
+		)
+		// Create voice channels
+		for i := 1; i < 4; i++ {
+			util.CreateChannel(
+				s, g, fmt.Sprintf("Teamzone %02d", i), t.Name+" - Teamzone", catTeamzone.ID,
+				discordgo.ChannelTypeGuildVoice, nil,
+			)
+		}
+	}
 }
