@@ -21,12 +21,15 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		return
 	}
 
-	// Get Guild ID
+	// Get guild ID and save to ServerConfig
 	g, err := s.Guild(ev.GuildID)
 	errors.Check(err, "Error getting guild for ID "+ev.GuildID)
-
-	// Save to ServerConfig
 	config.ServerConfig.GuildID = g.ID
+
+	// Save own user ID to ServerConfig
+	selfUser, err := s.User("@me")
+	errors.Check(err, "Failed getting User struct for @me")
+	config.ServerConfig.BotUserID = selfUser.ID
 
 	getEveryoneRoleID(s, g)
 

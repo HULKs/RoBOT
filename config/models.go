@@ -17,6 +17,7 @@ type TeamConf struct {
 type ServerConf struct {
 	EventName            string `json:"EventName"`
 	GuildID              string `json:"GuildID"`
+	BotUserID            string `json:"BotUserID"`
 	VoiceChannelCreateID string `json:"VoiceChannelCreateID"`
 	ArchiveCategoryID    string `json:"ArchiveCategoryID"`
 	EveryoneRoleID       string `json:"EveryoneRoleID"`
