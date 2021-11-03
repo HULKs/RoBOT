@@ -161,11 +161,51 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	)
 
 	// botcontrol
-	_, err = s.GuildChannelCreate(g.ID, "botcontrol", 0)
-	errors.Check(err, "Failed to create botcontrol channel")
-	// TODO Only Bot Admins
+	_ = util.CreateChannel(
+		s, g, "botcontrol", "", "", discordgo.ChannelTypeGuildText,
+		[]*discordgo.PermissionOverwrite{
+			// No rights for @everyone
+			{
+				ID:    config.ServerConfig.EveryoneRoleID,
+				Type:  discordgo.PermissionOverwriteTypeRole,
+				Deny:  discordgo.PermissionViewChannel,
+				Allow: 0,
+			},
+			// View channel for @Bot-Admin
+			{
+				ID:    config.ServerConfig.BotAdminRoleID,
+				Type:  discordgo.PermissionOverwriteTypeRole,
+				Deny:  0,
+				Allow: discordgo.PermissionViewChannel,
+			},
+			// View channel for bot
+			{
+				ID:    config.ServerConfig.BotUserID,
+				Type:  discordgo.PermissionOverwriteTypeMember,
+				Deny:  0,
+				Allow: discordgo.PermissionViewChannel,
+			},
+		},
+	)
 
 	// INFORMATION: announcements, links
+	catInformation := util.CreateCategory(
+		s, g, "Information", "", []*discordgo.PermissionOverwrite{
+			// Default permissions for @Participant
+			{
+				ID:    config.ServerConfig.ParticipantRoleID,
+				Type:  discordgo.PermissionOverwriteTypeRole,
+				Deny:  0,
+				Allow: 0,
+			},
+		},
+	)
+	_ = util.CreateChannel(
+		s, g, "announcements", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
+	)
+	_ = util.CreateChannel(
+		s, g, "links", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
+	)
 
 	// META: help, feedback
 
