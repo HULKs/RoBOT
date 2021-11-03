@@ -38,10 +38,6 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		// Delete everything on server
 		deleteChannelsAndRoles(s, g)
 
-		// Set server-wide permissions for @everyone
-		_, err = s.GuildRoleEdit(g.ID, config.ServerConfig.EveryoneRoleID, "", 0, false, 0, true)
-		errors.Check(err, "Failed setting permissions for @everyone role")
-
 		// Create Participant role
 		util.CreateRole(
 			s, g, "Participant", "0x000000",
@@ -118,23 +114,51 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 	// Get all Roles
 	roles, err := s.GuildRoles(g.ID)
 	for _, role := range roles {
-		if role.Name == "@everyone" || (strings.Contains(role.Name, "RoBOT") && role.Permissions == 8) {
-			// TODO Reset permissions for @everyone
+		if role.ID == config.ServerConfig.EveryoneRoleID ||
+			(strings.Contains(role.Name, "RoBOT") && role.Permissions == 8) {
 			continue
 		}
 		// Delete Role
 		err := s.GuildRoleDelete(g.ID, role.ID)
 		errors.Check(err, "Failed deleting role "+role.ID)
 	}
+	// Set server-wide permissions for @everyone
+	_, err = s.GuildRoleEdit(g.ID, config.ServerConfig.EveryoneRoleID, "", 0, false, 0, true)
+	errors.Check(err, "Failed setting permissions for @everyone role")
 }
 
 func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
-	var err error
 	// welcome
-	_, err = s.GuildChannelCreate(g.ID, "welcome", 0)
-	errors.Check(err, "Failed to create welcome channel")
-	// TODO set as system channel
-	// TODO set permissions
+	_ = util.CreateChannel(
+		s, g, "welcome", "", "", discordgo.ChannelTypeGuildText,
+		[]*discordgo.PermissionOverwrite{
+			// read-only for @everyone
+			{
+				ID:   config.ServerConfig.EveryoneRoleID,
+				Type: discordgo.PermissionOverwriteTypeRole,
+				Deny: 0,
+				Allow: discordgo.PermissionViewChannel |
+					discordgo.PermissionReadMessageHistory,
+			},
+		},
+	)
+	// TODO set welcome as system channel (Doesnt work, field in GuildParams missing)
+
+	// role-assignment
+	_ = util.CreateChannel(
+		s, g, "role-assignment", "", "", discordgo.ChannelTypeGuildText,
+		[]*discordgo.PermissionOverwrite{
+			// write for @everyone
+			{
+				ID:   config.ServerConfig.EveryoneRoleID,
+				Type: discordgo.PermissionOverwriteTypeRole,
+				Deny: 0,
+				Allow: discordgo.PermissionViewChannel |
+					discordgo.PermissionReadMessageHistory |
+					discordgo.PermissionSendMessages,
+			},
+		},
+	)
 
 	// botcontrol
 	_, err = s.GuildChannelCreate(g.ID, "botcontrol", 0)
