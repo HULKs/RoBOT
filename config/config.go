@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"sort"
 
 	"RoBOT/errors"
 	"RoBOT/util"
@@ -39,6 +40,11 @@ func loadTeamConfigs(dir string) {
 		util.LoadJSON(path.Join(dir, file.Name()), tc)
 		TeamList = append(TeamList, tc)
 	}
+	sort.Slice(
+		TeamList, func(i, j int) bool {
+			return TeamList[i].Name < TeamList[j].Name
+		},
+	)
 }
 
 func SaveServerConfig() {
