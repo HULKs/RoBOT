@@ -64,10 +64,8 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		createBasicChannels(s, g)
 
-		createTeamzones(s, g)
-
-		// TODO Create Magic Voice
 		// TODO Create Archive
+		// TODO Send role assignment message
 
 		config.SaveServerConfig()
 		config.SaveTeamConfig()
@@ -176,35 +174,12 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 				Deny:  0,
 				Allow: discordgo.PermissionViewChannel,
 			},
-			// View channel for bot
-			{
-				ID:    s.State.User.ID,
-				Type:  discordgo.PermissionOverwriteTypeMember,
-				Deny:  0,
-				Allow: discordgo.PermissionViewChannel,
-			},
 		},
 	)
 
 	// INFORMATION: announcements, links
 	catInformation := util.CreateCategory(
-		s, g, "Information", "", []*discordgo.PermissionOverwrite{
-			// Default permissions for @Participant
-			{
-				ID:   config.ServerConfig.EveryoneRoleID,
-				Type: discordgo.PermissionOverwriteTypeRole,
-				Deny: discordgo.PermissionViewChannel |
-					discordgo.PermissionVoiceConnect,
-				Allow: 0,
-			},
-			{
-				ID:   config.ServerConfig.ParticipantRoleID,
-				Type: discordgo.PermissionOverwriteTypeRole,
-				Deny: 0,
-				Allow: discordgo.PermissionViewChannel |
-					discordgo.PermissionVoiceConnect,
-			},
-		},
+		s, g, "Information", "", config.GetPermOverParticipantDefault(),
 	)
 	_ = util.CreateChannel(
 		s, g, "announcements", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
@@ -219,10 +194,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 
 	// GENERAL: town-hall, Voice: Town-Hall, Lounge 01-02, AFK
 
-}
-
-func createTeamzones(s *discordgo.Session, g *discordgo.Guild) {
-	// Create role for each team
+	// Create teamzone for each team
 	log.Println("Creating teamzones...")
 	for _, t := range config.TeamList {
 		// Create teamzone category
@@ -259,4 +231,14 @@ func createTeamzones(s *discordgo.Session, g *discordgo.Guild) {
 			)
 		}
 	}
+
+	// Create category for magic voice channels
+	catMagic := util.CreateCategory(s, g, "Create Meetings", "", config.GetPermOverParticipantDefault())
+	// Create channel to create moar channels
+	chMagicVoice := util.CreateChannel(
+		s, g, "Click to create room", "", catMagic.ID,
+		discordgo.ChannelTypeGuildVoice, nil,
+	)
+	// Save ID to ServerConfig
+	config.ServerConfig.VoiceChannelCreateID = chMagicVoice.ID
 }
