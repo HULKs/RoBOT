@@ -27,11 +27,6 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 	errors.Check(err, "Error getting guild for ID "+ev.GuildID)
 	config.ServerConfig.GuildID = g.ID
 
-	// Save own user ID to ServerConfig
-	selfUser, err := s.User("@me")
-	errors.Check(err, "Failed getting User struct for @me")
-	config.ServerConfig.BotUserID = selfUser.ID
-
 	getEveryoneRoleID(s, g)
 
 	switch strings.ToLower(args[0]) {
@@ -183,7 +178,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 			},
 			// View channel for bot
 			{
-				ID:    config.ServerConfig.BotUserID,
+				ID:    s.State.User.ID,
 				Type:  discordgo.PermissionOverwriteTypeMember,
 				Deny:  0,
 				Allow: discordgo.PermissionViewChannel,
