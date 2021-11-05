@@ -8,6 +8,7 @@ var (
 func init() {
 	commandMap["ping"] = Command{pingRun, pingHelp}
 	commandMap["setup"] = Command{setupRun, setupRun}
+	commandMap["rename"] = Command{renameRun, renameHelp}
 }
 
 func GetCommand(str string) Command {
