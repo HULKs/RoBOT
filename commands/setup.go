@@ -241,4 +241,12 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	)
 	// Save ID to ServerConfig
 	config.ServerConfig.VoiceChannelCreateID = chMagicVoice.ID
+
+	// Create Archive category
+	catArchive := util.CreateCategory(
+		s, g, "Archive", "Archived channels",
+		util.PermOverwriteHideForAShowForB(config.ServerConfig.EveryoneRoleID, config.ServerConfig.ParticipantRoleID),
+	)
+	// Save to config
+	config.ServerConfig.ArchiveCategoryID = catArchive.ID
 }
