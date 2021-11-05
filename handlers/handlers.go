@@ -57,27 +57,34 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 	errors.Check(err, "[VoiceStateUpdate] Failed getting guild for ID "+ev.GuildID)
 	// Get user
 	user, err := s.User(ev.UserID)
-	errors.Check(err, "Failed getting user for UserID "+ev.UserID)
+	errors.Check(err, "[VoiceStateUpdate] Failed getting user for UserID "+ev.UserID)
+	// Get Archive category
+	catArchive, err := s.Channel(config.ServerConfig.ArchiveCategoryID)
+	errors.Check(err, "[VoiceStateUpdate] Failed getting Archive category channel")
 
 	// Create new category and new text and voice channel
-	log.Printf("Creating new meeting for user %s", user.Username)
-	catNew := util.CreateCategory(
-		s, g, "New Meeting", "", append(
-			// Hide for @everyone, Default permissions for @Participant
-			util.PermOverwriteHideForAShowForB(
-				config.ServerConfig.EveryoneRoleID,
-				config.ServerConfig.ParticipantRoleID,
+	log.Printf("[VoiceStateUpdate] Creating new meeting for user %s", user.Username)
+	catNew, err := s.GuildChannelCreateComplex(
+		g.ID, discordgo.GuildChannelCreateData{
+			Name:     "New Meeting",
+			Type:     discordgo.ChannelTypeGuildCategory,
+			Position: catArchive.Position - 1,
+			PermissionOverwrites: append(
+				// Hide for @everyone, Default permissions for @Participant
+				util.PermOverwriteHideForAShowForB(
+					config.ServerConfig.EveryoneRoleID,
+					config.ServerConfig.ParticipantRoleID,
+				),
+				// Add management permissions for meeting organizer
+				&discordgo.PermissionOverwrite{
+					ID:    ev.UserID,
+					Type:  discordgo.PermissionOverwriteTypeRole,
+					Deny:  0,
+					Allow: discordgo.PermissionManageChannels,
+				},
 			),
-			// Add management permissions for meeting organizer
-			&discordgo.PermissionOverwrite{
-				ID:    ev.UserID,
-				Type:  discordgo.PermissionOverwriteTypeRole,
-				Deny:  0,
-				Allow: discordgo.PermissionManageChannels,
-			},
-		),
+		},
 	)
-	// TODO Insert above archive
 	// Create Text channel and Voice channel
 	util.CreateChannel(
 		s, g, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil,
@@ -89,7 +96,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 	// Move user to new channel
 	err = s.GuildMemberMove(g.ID, user.ID, &chVoice.ID)
 	errors.Check(err, "[VoiceStatUpdate] Failed moving user "+user.Username+" to new voice channel")
-	log.Printf("Moved user %s to channel %s after creating new meeting", user.Username, chVoice.Name)
+	log.Printf("[VoiceStateUpdate] Moved user %s to channel %s after creating new meeting", user.Username, chVoice.Name)
 }
 
 // Ready is called when receiving the "ready" event
