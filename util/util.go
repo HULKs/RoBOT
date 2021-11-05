@@ -102,3 +102,24 @@ func CreateChannel(
 
 	return channel
 }
+
+// PermOverwriteHideForAShowForB returns the PermissionOverwrites for channels
+// that should be visible for A, but not B
+func PermOverwriteHideForAShowForB(A, B string) []*discordgo.PermissionOverwrite {
+	return []*discordgo.PermissionOverwrite{
+		{
+			ID:   A,
+			Type: discordgo.PermissionOverwriteTypeRole,
+			Deny: discordgo.PermissionViewChannel |
+				discordgo.PermissionVoiceConnect,
+			Allow: 0,
+		},
+		{
+			ID:   B,
+			Type: discordgo.PermissionOverwriteTypeRole,
+			Deny: 0,
+			Allow: discordgo.PermissionViewChannel |
+				discordgo.PermissionVoiceConnect,
+		},
+	}
+}
