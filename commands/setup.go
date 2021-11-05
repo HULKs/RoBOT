@@ -34,6 +34,10 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		// Delete everything on server
 		deleteChannelsAndRoles(s, g)
 
+		// Rename server
+		_, err := s.GuildEdit(g.ID, discordgo.GuildParams{Name: config.ServerConfig.EventName})
+		errors.Check(err, "Failed renaming Server")
+
 		// Create Participant role
 		util.CreateRole(
 			s, g, "Participant", "0x000000",
