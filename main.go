@@ -24,6 +24,9 @@ func main() {
 	// Add Handler for Ready events
 	session.AddHandler(handlers.Ready)
 
+	// Add handler for VoiceStateUpdate
+	session.AddHandler(handlers.VoiceStateUpdate)
+
 	// Open a websocket connection to Discord and begin listening
 	err = session.Open()
 	errors.Check(err, "Error opening connection")
