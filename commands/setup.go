@@ -68,7 +68,6 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		createBasicChannels(s, g)
 
-		// TODO Create Archive
 		// TODO Send role assignment message
 
 		config.SaveServerConfig()
@@ -108,7 +107,7 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 	errors.Check(err, "Failed to get channels for ID "+g.ID)
 	// Delete all channels
 	for _, channel := range channels {
-		_, err := s.ChannelDelete(channel.ID)
+		_, err = s.ChannelDelete(channel.ID)
 		errors.Check(err, "Failed deleting channel "+channel.ID)
 	}
 	// Get all Roles
@@ -119,7 +118,7 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 			continue
 		}
 		// Delete Role
-		err := s.GuildRoleDelete(g.ID, role.ID)
+		err = s.GuildRoleDelete(g.ID, role.ID)
 		errors.Check(err, "Failed deleting role "+role.ID)
 	}
 	// Set server-wide permissions for @everyone
@@ -184,6 +183,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 		s, g, "links", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
 	)
 
+	// TODO more basic channels
 	// META: help, feedback
 
 	// PHOTOS: photo-wall, participant-selfie
