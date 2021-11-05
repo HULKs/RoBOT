@@ -193,6 +193,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 		catTeamzone := util.CreateCategory(
 			s, g, t.Name, t.Name+" - Teamzone",
 			[]*discordgo.PermissionOverwrite{
+				// Hide for @everyone
 				{
 					ID:   config.ServerConfig.EveryoneRoleID,
 					Type: discordgo.PermissionOverwriteTypeRole,
@@ -200,6 +201,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 						discordgo.PermissionVoiceConnect,
 					Allow: 0,
 				},
+				// All permissions for team
 				{
 					ID:   t.RoleID,
 					Type: discordgo.PermissionOverwriteTypeRole,
