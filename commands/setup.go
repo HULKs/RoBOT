@@ -249,7 +249,10 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	// Create Archive category
 	catArchive := util.CreateCategory(
 		s, g, "Archive", "Archived channels",
-		util.PermOverwriteHideForAShowForB(config.ServerConfig.EveryoneRoleID, config.ServerConfig.ParticipantRoleID),
+		util.PermOverwriteHideForAShowForB(
+			config.ServerConfig.EveryoneRoleID,
+			config.ServerConfig.ParticipantRoleID,
+		),
 	)
 	// Save to config
 	config.ServerConfig.ArchiveCategoryID = catArchive.ID
