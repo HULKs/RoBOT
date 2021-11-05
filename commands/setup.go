@@ -159,27 +159,19 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	// botcontrol
 	_ = util.CreateChannel(
 		s, g, "botcontrol", "", "", discordgo.ChannelTypeGuildText,
-		[]*discordgo.PermissionOverwrite{
-			// No rights for @everyone
-			{
-				ID:    config.ServerConfig.EveryoneRoleID,
-				Type:  discordgo.PermissionOverwriteTypeRole,
-				Deny:  discordgo.PermissionViewChannel,
-				Allow: 0,
-			},
-			// View channel for @Bot-Admin
-			{
-				ID:    config.ServerConfig.BotAdminRoleID,
-				Type:  discordgo.PermissionOverwriteTypeRole,
-				Deny:  0,
-				Allow: discordgo.PermissionViewChannel,
-			},
-		},
+		util.PermOverwriteHideForAShowForB(
+			config.ServerConfig.EveryoneRoleID,
+			config.ServerConfig.BotAdminRoleID,
+		),
 	)
 
 	// INFORMATION: announcements, links
 	catInformation := util.CreateCategory(
-		s, g, "Information", "", config.GetPermOverParticipantDefault(),
+		s, g, "Information", "",
+		util.PermOverwriteHideForAShowForB(
+			config.ServerConfig.EveryoneRoleID,
+			config.ServerConfig.ParticipantRoleID,
+		),
 	)
 	_ = util.CreateChannel(
 		s, g, "announcements", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
@@ -233,7 +225,13 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	}
 
 	// Create category for magic voice channels
-	catMagic := util.CreateCategory(s, g, "Create Meetings", "", config.GetPermOverParticipantDefault())
+	catMagic := util.CreateCategory(
+		s, g, "Create Meetings", "",
+		util.PermOverwriteHideForAShowForB(
+			config.ServerConfig.EveryoneRoleID,
+			config.ServerConfig.ParticipantRoleID,
+		),
+	)
 	// Create channel to create moar channels
 	chMagicVoice := util.CreateChannel(
 		s, g, "Click to create room", "", catMagic.ID,
