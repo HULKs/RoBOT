@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"RoBOT/config"
-	"RoBOT/errors"
 	"RoBOT/helptexts"
 	"RoBOT/util"
 
@@ -15,16 +14,16 @@ import (
 
 func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 
-	// Check for arguments
+	// ErrCheck for arguments
 	if len(args) == 0 {
 		msg, err := s.ChannelMessageSend(ev.ChannelID, "You didn't give any arguments!")
-		errors.CheckMsgSend(err, msg.GuildID, msg.ChannelID)
+		util.CheckMsgSend(err, msg.GuildID, msg.ChannelID)
 		return
 	}
 
 	// Get guild ID and save to ServerConfig
 	g, err := s.Guild(ev.GuildID)
-	errors.Check(err, "Error getting guild for ID "+ev.GuildID)
+	util.ErrCheck(err, "Error getting guild for ID "+ev.GuildID)
 	config.ServerConfig.GuildID = g.ID
 
 	getEveryoneRoleID(s, g)
@@ -36,7 +35,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		// Rename server
 		_, err := s.GuildEdit(g.ID, discordgo.GuildParams{Name: config.ServerConfig.EventName})
-		errors.Check(err, "Failed renaming Server")
+		util.ErrCheck(err, "Failed renaming Server")
 
 		// Create Participant role
 		util.CreateRole(
@@ -81,7 +80,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 func setupHelp(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	_, err := s.ChannelMessageSend(ev.ChannelID, helptexts.DB["ping"])
-	errors.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
+	util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
 }
 
 // getEveryoneRoleID saves the ID for the @everyone role to the ServerConfig
@@ -89,7 +88,7 @@ func getEveryoneRoleID(s *discordgo.Session, g *discordgo.Guild) {
 	// TODO Add logging
 	// Get roles for guild
 	roles, err := s.GuildRoles(g.ID)
-	errors.Check(err, "Error getting roles for "+g.Name)
+	util.ErrCheck(err, "Error getting roles for "+g.Name)
 	// Get ID for @everyone
 	for _, role := range roles {
 		if role.Name == "@everyone" {
@@ -104,11 +103,11 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 	// TODO Add logging
 	// Get all channels in server
 	channels, err := s.GuildChannels(g.ID)
-	errors.Check(err, "Failed to get channels for ID "+g.ID)
+	util.ErrCheck(err, "Failed to get channels for ID "+g.ID)
 	// Delete all channels
 	for _, channel := range channels {
 		_, err = s.ChannelDelete(channel.ID)
-		errors.Check(err, "Failed deleting channel "+channel.ID)
+		util.ErrCheck(err, "Failed deleting channel "+channel.ID)
 	}
 	// Get all Roles
 	roles, err := s.GuildRoles(g.ID)
@@ -119,11 +118,11 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 		}
 		// Delete Role
 		err = s.GuildRoleDelete(g.ID, role.ID)
-		errors.Check(err, "Failed deleting role "+role.ID)
+		util.ErrCheck(err, "Failed deleting role "+role.ID)
 	}
 	// Set server-wide permissions for @everyone
 	_, err = s.GuildRoleEdit(g.ID, config.ServerConfig.EveryoneRoleID, "", 0, false, 0, true)
-	errors.Check(err, "Failed setting permissions for @everyone role")
+	util.ErrCheck(err, "Failed setting permissions for @everyone role")
 }
 
 func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {

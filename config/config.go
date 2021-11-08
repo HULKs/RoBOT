@@ -7,7 +7,6 @@ import (
 	"path"
 	"sort"
 
-	"RoBOT/errors"
 	"RoBOT/util"
 )
 
@@ -31,7 +30,7 @@ func init() {
 
 func loadTeamConfigs(dir string) {
 	dirEntries, err := os.ReadDir(dir)
-	errors.Check(err, "Failed to ls db")
+	util.ErrCheck(err, "Failed to ls db")
 	for _, file := range dirEntries {
 		if !file.Type().IsRegular() {
 			continue
@@ -49,18 +48,18 @@ func loadTeamConfigs(dir string) {
 
 func SaveServerConfig() {
 	conf, err := json.Marshal(ServerConfig)
-	errors.Check(err, "Failed to marshal ServerConfig")
+	util.ErrCheck(err, "Failed to marshal ServerConfig")
 	err = ioutil.WriteFile("db/server.json", conf, 0600)
-	errors.Check(err, "Error writing db/server.json")
+	util.ErrCheck(err, "Error writing db/server.json")
 }
 
 func SaveTeamConfig() {
 	for _, team := range TeamList {
 		conf, err := json.Marshal(team)
-		errors.Check(err, "Failed marshaling team "+team.Name)
+		util.ErrCheck(err, "Failed marshaling team "+team.Name)
 
 		filename := "db/teams/" + team.Name + ".json"
 		err = ioutil.WriteFile(filename, conf, 0600)
-		errors.Check(err, "Error writing "+filename)
+		util.ErrCheck(err, "Error writing "+filename)
 	}
 }

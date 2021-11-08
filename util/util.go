@@ -2,11 +2,10 @@ package util
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"strconv"
-
-	"RoBOT/errors"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -15,15 +14,15 @@ import (
 func LoadJSON(path string, target interface{}) {
 	// Read []byte from file
 	dat, err := ioutil.ReadFile(path)
-	errors.Check(err, "Error reading from file")
+	ErrCheck(err, "Error reading from file")
 	// Parse json
 	err = json.Unmarshal(dat, &target)
-	errors.Check(err, "Failed to parse json")
+	ErrCheck(err, "Failed to parse json")
 }
 
 func ParseTeamColor(name, hex string) int {
 	tc, err := strconv.ParseInt(hex, 0, 0)
-	errors.Check(err, "Failed to parse TeamColor for team "+name)
+	ErrCheck(err, "Failed to parse TeamColor for team "+name)
 	return int(tc)
 }
 
@@ -40,7 +39,7 @@ func CreateRole(
 ) *discordgo.Role {
 	// Create Role
 	role, err := s.GuildRoleCreate(g.ID)
-	errors.Check(err, "Failed to create Role \""+name+"\"")
+	ErrCheck(err, "Failed to create Role \""+name+"\"")
 	log.Printf("[%s] Created Role (%s)", role.ID, name)
 
 	// Add Role ID to config
@@ -51,11 +50,11 @@ func CreateRole(
 
 	// Parse color
 	col, err := ParseHexColor(hexColor)
-	errors.Check(err, "Failed to parse color from "+hexColor+" for role "+name)
+	ErrCheck(err, "Failed to parse color from "+hexColor+" for role "+name)
 
 	// Edit Role, set name and permissions
 	_, err = s.GuildRoleEdit(g.ID, role.ID, name, col, hoist, perm, mention)
-	errors.Check(err, "Failed to edit Role \""+name+"\"")
+	ErrCheck(err, "Failed to edit Role \""+name+"\"")
 	log.Printf(
 		"[%s] Edited Role (Name: %s, Color: %s, Perm: %d, Hoist: %t, Mention: %t)",
 		role.ID, name, hexColor, perm, hoist, mention,
@@ -77,7 +76,7 @@ func CreateCategory(
 			PermissionOverwrites: permissionOverwrites,
 		},
 	)
-	errors.Check(err, "Failed creating category "+name)
+	ErrCheck(err, "Failed creating category "+name)
 	log.Printf("[%s] Created category: %s", category.ID, category.Name)
 
 	return category
@@ -97,7 +96,7 @@ func CreateChannel(
 			PermissionOverwrites: permissionOverwrites,
 		},
 	)
-	errors.Check(err, "Failed creating channel "+name)
+	ErrCheck(err, "Failed creating channel "+name)
 	log.Printf("[%s] Created channel: %s", channel.ID, channel.Name)
 
 	return channel
@@ -122,4 +121,16 @@ func PermOverwriteHideForAShowForB(A, B string) []*discordgo.PermissionOverwrite
 				discordgo.PermissionVoiceConnect,
 		},
 	}
+}
+
+// ErrCheck panics with an error message if err != nil
+func ErrCheck(err error, logMsg string) {
+	if err != nil {
+		log.Panicf("[ERROR] %s", logMsg)
+	}
+}
+
+// CheckMsgSend is a wrapper for errors.ErrCheck with a msg prefilled for ChannelMessageSend errors
+func CheckMsgSend(err error, gid string, chid string) {
+	ErrCheck(err, fmt.Sprintf("Failed sending message in guild: %s in channel: %s", gid, chid))
 }

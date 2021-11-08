@@ -7,8 +7,8 @@ import (
 	"syscall"
 
 	"RoBOT/config"
-	"RoBOT/errors"
 	"RoBOT/handlers"
+	"RoBOT/util"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -16,7 +16,7 @@ import (
 func main() {
 	// Create a new Discord session using the provided bot token
 	session, err := discordgo.New("Bot " + config.RoBotConfig.Token)
-	errors.Check(err, "Error creating Discord session")
+	util.ErrCheck(err, "Error creating Discord session")
 
 	// Add handler for MessageCreate events
 	session.AddHandler(handlers.MessageCreate)
@@ -29,7 +29,7 @@ func main() {
 
 	// Open a websocket connection to Discord and begin listening
 	err = session.Open()
-	errors.Check(err, "Error opening connection")
+	util.ErrCheck(err, "Error opening connection")
 
 	// Wait here until CTRL-C or other term signal is received
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
@@ -39,5 +39,5 @@ func main() {
 
 	// Cleanly close down the Discord session
 	err = session.Close()
-	errors.Check(err, "Failed to close session properly")
+	util.ErrCheck(err, "Failed to close session properly")
 }

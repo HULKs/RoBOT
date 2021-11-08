@@ -6,7 +6,6 @@ import (
 
 	"RoBOT/commands"
 	"RoBOT/config"
-	"RoBOT/errors"
 	"RoBOT/util"
 
 	"github.com/bwmarrin/discordgo"
@@ -54,13 +53,13 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 	}
 	// Get guild
 	g, err := s.Guild(ev.GuildID)
-	errors.Check(err, "[VoiceStateUpdate] Failed getting guild for ID "+ev.GuildID)
+	util.ErrCheck(err, "[VoiceStateUpdate] Failed getting guild for ID "+ev.GuildID)
 	// Get user
 	user, err := s.User(ev.UserID)
-	errors.Check(err, "[VoiceStateUpdate] Failed getting user for UserID "+ev.UserID)
+	util.ErrCheck(err, "[VoiceStateUpdate] Failed getting user for UserID "+ev.UserID)
 	// Get Archive category
 	catArchive, err := s.Channel(config.ServerConfig.ArchiveCategoryID)
-	errors.Check(err, "[VoiceStateUpdate] Failed getting Archive category channel")
+	util.ErrCheck(err, "[VoiceStateUpdate] Failed getting Archive category channel")
 
 	// Create new category and new text and voice channel
 	log.Printf("[VoiceStateUpdate] Creating new meeting for user %s", user.Username)
@@ -95,7 +94,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 
 	// Move user to new channel
 	err = s.GuildMemberMove(g.ID, user.ID, &chVoice.ID)
-	errors.Check(err, "[VoiceStatUpdate] Failed moving user "+user.Username+" to new voice channel")
+	util.ErrCheck(err, "[VoiceStatUpdate] Failed moving user "+user.Username+" to new voice channel")
 	log.Printf("[VoiceStateUpdate] Moved user %s to channel %s after creating new meeting", user.Username, chVoice.Name)
 }
 
@@ -103,5 +102,5 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 func Ready(s *discordgo.Session, _ *discordgo.Ready) {
 	// Set the playing status
 	err := s.UpdateGameStatus(0, "with gophers...")
-	errors.Check(err, "Failed setting custom status")
+	util.ErrCheck(err, "Failed setting custom status")
 }
