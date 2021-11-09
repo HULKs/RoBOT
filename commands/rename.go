@@ -58,10 +58,11 @@ func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	// Rename all channels with this category as parent
 	for _, gch := range guildChannels {
 		if gch.ParentID == parent.ID {
-			if gch.Type == discordgo.ChannelTypeGuildText {
+			switch gch.Type {
+			case discordgo.ChannelTypeGuildText:
 				_, err = s.ChannelEdit(gch.ID, newNameText)
 				util.ErrCheck(err, "[Rename] Failed renaming text channel "+gch.Name)
-			} else if gch.Type == discordgo.ChannelTypeGuildVoice {
+			case discordgo.ChannelTypeGuildVoice:
 				_, err = s.ChannelEdit(gch.ID, newName)
 				util.ErrCheck(err, "[Rename] Failed renaming voice channel "+gch.Name)
 			}
