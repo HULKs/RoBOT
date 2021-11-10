@@ -12,6 +12,20 @@ import (
 )
 
 func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
+	var err error
+
+	// Get channel
+	channel, err := s.Channel(ev.ChannelID)
+	util.ErrCheck(err, "[Archive] Failed getting channel for ID "+ev.ChannelID)
+
+	// Check if inside protected channel
+	if config.IsProtected(channel) {
+		log.Printf("[Archive] User %s tried archive in a protected channel %s !", ev.Author.Username, channel.Name)
+		err = util.SendProtectedCommandEmbed(s, ev.ChannelID)
+		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
+		return
+	}
+
 	// ErrCheck if user has permission
 	userPerms, err := s.State.MessagePermissions(ev.Message)
 	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+ev.Author.Username)
@@ -29,9 +43,6 @@ func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string
 		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
 		return
 	}
-	// Get channel
-	channel, err := s.Channel(ev.ChannelID)
-	util.ErrCheck(err, "[Archive] Failed getting channel for ID "+ev.ChannelID)
 
 	// Don't continue if we are already archived
 	if channel.ParentID == config.ServerConfig.ArchiveCategoryID {
