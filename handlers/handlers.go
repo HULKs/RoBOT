@@ -38,7 +38,7 @@ func MessageCreate(s *discordgo.Session, ev *discordgo.MessageCreate) {
 		command.Help(s, ev, input)
 		return
 	}
-	// Call all the methods for the associated command
+	// Call the associated command
 	command.Run(s, ev, input[1:])
 }
 
