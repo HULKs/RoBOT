@@ -15,14 +15,15 @@ type TeamConf struct {
 
 // ServerConf represents db/server.json
 type ServerConf struct {
-	EventName            string `json:"EventName"`
-	GuildID              string `json:"GuildID"`
-	VoiceChannelCreateID string `json:"VoiceChannelCreateID"`
-	ArchiveCategoryID    string `json:"ArchiveCategoryID"`
-	EveryoneRoleID       string `json:"EveryoneRoleID"`
-	ParticipantRoleID    string `json:"ParticipantRoleID"`
-	OrgaTeamRoleID       string `json:"OrgaTeamRoleID"`
-	BotAdminRoleID       string `json:"BotAdminRoleID"`
+	EventName            string                 `json:"EventName"`
+	GuildID              string                 `json:"GuildID"`
+	VoiceChannelCreateID string                 `json:"VoiceChannelCreateID"`
+	ArchiveCategoryID    string                 `json:"ArchiveCategoryID"`
+	EveryoneRoleID       string                 `json:"EveryoneRoleID"`
+	ParticipantRoleID    string                 `json:"ParticipantRoleID"`
+	OrgaTeamRoleID       string                 `json:"OrgaTeamRoleID"`
+	BotAdminRoleID       string                 `json:"BotAdminRoleID"`
+	ProtectedChannels    map[string]interface{} `json:"ProtectedChannels"`
 	PermissionTemplates  struct {
 		Everyone    int64 `json:"Everyone"`
 		OrgaTeam    int64 `json:"Orga-Team"`
