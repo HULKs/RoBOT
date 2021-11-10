@@ -165,7 +165,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	)
 	config.ServerConfig.ProtectedChannels[chRoleAssignment.ID] = nil
 	// Save ID to ServerConfig
-	config.ServerConfig.RoleAssignmentChannelID = chWelcome.ID
+	config.ServerConfig.RoleAssignmentChannelID = chRoleAssignment.ID
 
 	// botcontrol
 	chBotcontrol := util.CreateChannel(
