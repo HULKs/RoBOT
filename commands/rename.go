@@ -13,10 +13,22 @@ import (
 )
 
 // TODO For some reason this only works twice per channel. Don't make too many typos I guess!
-// TODO Answer with message to confirm change
-// TODO Don't do this in the Archive!!!
 
 func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
+	var err error
+
+	// Get channel
+	channel, err := s.Channel(ev.ChannelID)
+	util.ErrCheck(err, "[Rename] Failed getting channel for "+ev.ChannelID)
+
+	// Check if inside protected channel
+	if config.IsProtected(channel) {
+		log.Printf("[Rename] User %s tried rename in protected channel %s !", ev.Author.Username, channel.Name)
+		err = util.SendProtectedCommandEmbed(s, ev.ChannelID)
+		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
+		return
+	}
+
 	// ErrCheck if user has permission
 	userPerms, err := s.State.MessagePermissions(ev.Message)
 	util.ErrCheck(err, "[Rename] Failed getting permissions for user "+ev.Author.Username)
@@ -44,9 +56,6 @@ func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	newName := strings.TrimSpace(builder.String())
 	newNameText := strings.ToLower(strings.ReplaceAll(newName, " ", "_"))
 
-	// Get channel
-	channel, err := s.Channel(ev.ChannelID)
-	util.ErrCheck(err, "[Rename] Failed getting channel for "+ev.ChannelID)
 	// Get Archive category for position
 	catArchive, err := s.Channel(config.ServerConfig.ArchiveCategoryID)
 	util.ErrCheck(err, "[Rename] Failed getting Archive category")
