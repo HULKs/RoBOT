@@ -3,6 +3,7 @@ package commands
 import (
 	"log"
 
+	"RoBOT/colors"
 	"RoBOT/config"
 	"RoBOT/helptexts"
 	"RoBOT/util"
@@ -15,8 +16,17 @@ func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string
 	userPerms, err := s.State.MessagePermissions(ev.Message)
 	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+ev.Author.Username)
 	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
-		log.Printf("[Archive] User %s has no permissions to delete channel!", ev.Author.Username)
-		// TODO Send message to notify user
+		log.Printf("[Archive] User %s has no permissions to archive channel!", ev.Author.Username)
+		_, err = s.ChannelMessageSendEmbed(
+			ev.ChannelID, &discordgo.MessageEmbed{
+				Title: "You don't have the necessary permissions to use this command. This incident will be reported.",
+				Color: colors.RED,
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: "If you think this is an error, contact the RoBOT-Admins",
+				},
+			},
+		)
+		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
 		return
 	}
 	// Get channel
