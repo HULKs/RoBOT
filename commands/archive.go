@@ -31,7 +31,7 @@ func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string
 		return
 	}
 
-	// Get other channels in category (catChs) and append category
+	// Get other channels in category (catChs)
 	var catChs []*string
 	gChs, err := s.GuildChannels(ev.GuildID)
 	util.ErrCheck(err, "[Archive] Failed getting guild channels")
