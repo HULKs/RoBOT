@@ -128,7 +128,9 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 
 	// Move user to new channel
 	err = s.GuildMemberMove(g.ID, user.ID, &chVoice.ID)
-	util.ErrCheck(err, "[VoiceStatUpdate] Failed moving user "+user.Username+" to new voice channel")
+	if err != nil {
+		log.Printf("[VoiceStateUpdate] Failed moving user %s to new voice channel", user.Mention())
+	}
 	log.Printf("[VoiceStateUpdate] Moved user %s to channel %s after creating new meeting", user.Username, chVoice.Name)
 }
 
