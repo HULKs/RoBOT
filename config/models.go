@@ -19,6 +19,7 @@ type ServerConf struct {
 	GuildID              string                 `json:"GuildID"`
 	VoiceChannelCreateID string                 `json:"VoiceChannelCreateID"`
 	ArchiveCategoryID    string                 `json:"ArchiveCategoryID"`
+	WelcomeChannelID     string                 `json:"WelcomeChannelID"`
 	EveryoneRoleID       string                 `json:"EveryoneRoleID"`
 	ParticipantRoleID    string                 `json:"ParticipantRoleID"`
 	OrgaTeamRoleID       string                 `json:"OrgaTeamRoleID"`
