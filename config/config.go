@@ -25,6 +25,10 @@ func init() {
 	// Load the config db
 	util.LoadJSON("db/config.json", &RoBotConfig)
 	util.LoadJSON("db/server.json", &ServerConfig)
+	// Ensure ProtectedChannels is not nil
+	if ServerConfig.ProtectedChannels == nil {
+		ServerConfig.ProtectedChannels = make(map[string]interface{})
+	}
 	loadTeamConfigs("db/teams")
 }
 
