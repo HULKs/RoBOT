@@ -130,6 +130,8 @@ func ErrCheck(err error, logMsg string) {
 	}
 }
 
+// TODO Change this so it gets a *Guild and a *Channel
+
 // CheckMsgSend is a wrapper for errors.ErrCheck with a msg prefilled for ChannelMessageSend errors
 func CheckMsgSend(err error, gid string, chid string) {
 	ErrCheck(err, fmt.Sprintf("Failed sending message in guild: %s in channel: %s", gid, chid))
