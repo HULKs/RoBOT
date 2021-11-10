@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"RoBOT/colors"
 	"RoBOT/config"
 	"RoBOT/helptexts"
 	"RoBOT/util"
@@ -21,7 +22,16 @@ func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	util.ErrCheck(err, "[Rename] Failed getting permissions for user "+ev.Author.Username)
 	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
 		log.Printf("[Rename] User %s has no permissions to rename channel!", ev.Author.Username)
-		// TODO Send message to notify user
+		_, err = s.ChannelMessageSendEmbed(
+			ev.ChannelID, &discordgo.MessageEmbed{
+				Title: "You don't have the necessary permissions to use this command. This incident will be reported.",
+				Color: colors.RED,
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: "If you think this is an error, contact the RoBOT-Admins",
+				},
+			},
+		)
+		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
 		return
 	}
 
