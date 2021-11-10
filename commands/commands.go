@@ -11,6 +11,7 @@ func init() {
 	commandMap["rename"] = Command{renameRun, renameHelp}
 	commandMap["archive"] = Command{archiveRun, archiveHelp}
 	commandMap["delete"] = Command{deleteRun, deleteHelp}
+	commandMap["team"] = Command{teamRun, teamHelp}
 }
 
 func GetCommand(str string) Command {
