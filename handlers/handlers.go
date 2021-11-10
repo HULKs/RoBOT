@@ -113,13 +113,19 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 			Fields: []*discordgo.MessageEmbedField{
 				{
 					Name:   fmt.Sprintf("`%srename`", config.RoBotConfig.Prefix),
-					Value:  "With the rename command, you can conveniently rename all channels belonging to your meeting.",
+					Value:  "With the rename command, you can conveniently rename all channels belonging to your meeting at once.",
 					Inline: false,
 				},
 				{
 					Name: fmt.Sprintf("`%sarchive`", config.RoBotConfig.Prefix),
 					Value: "With the archive command, you can move your text channel to the archive category after your meeting has ended. " +
-						"If you use the archive command, **ALL OTHER CHANNELS IN THE CATEGORY will be DELETED!** Be careful!",
+						"\n**If you use the archive command, ALL OTHER CHANNELS IN THE CATEGORY will be DELETED! Be careful!**",
+					Inline: false,
+				},
+				{
+					Name: fmt.Sprintf("`%sdelete`", config.RoBotConfig.Prefix),
+					Value: "With the delete command, you can delete your meeting if there is nothing of interest to preserve in any of the channels." +
+						"\n**ALL channels AND the category will be DELETED!**",
 					Inline: false,
 				},
 			},
