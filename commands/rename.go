@@ -18,9 +18,9 @@ import (
 func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	// ErrCheck if user has permission
 	userPerms, err := s.State.MessagePermissions(ev.Message)
-	util.ErrCheck(err, "[Rename] Failed getting permissions for user "+ev.Author.Mention())
+	util.ErrCheck(err, "[Rename] Failed getting permissions for user "+ev.Author.Username)
 	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
-		log.Printf("[Rename] User %s has no permissions to rename channel!", ev.Author.Mention())
+		log.Printf("[Rename] User %s has no permissions to rename channel!", ev.Author.Username)
 		// TODO Send message to notify user
 		return
 	}
@@ -63,10 +63,10 @@ func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 			switch gch.Type {
 			case discordgo.ChannelTypeGuildText:
 				_, err = s.ChannelEdit(gch.ID, newNameText)
-				util.ErrCheck(err, "[Rename] Failed renaming text channel "+gch.Mention())
+				util.ErrCheck(err, "[Rename] Failed renaming text channel "+gch.Name)
 			case discordgo.ChannelTypeGuildVoice:
 				_, err = s.ChannelEdit(gch.ID, newName)
-				util.ErrCheck(err, "[Rename] Failed renaming voice channel "+gch.Mention())
+				util.ErrCheck(err, "[Rename] Failed renaming voice channel "+gch.Name)
 			}
 		}
 	}
