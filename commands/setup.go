@@ -39,23 +39,17 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		_, err := s.GuildEdit(g.ID, discordgo.GuildParams{Name: config.ServerConfig.EventName})
 		util.ErrCheck(err, "Failed renaming Server")
 
-		// Create Participant role
-		util.CreateRole(
-			s, g, "Participant", "0x000000",
-			config.ServerConfig.PermissionTemplates.Participant,
-			false, false, &config.ServerConfig.ParticipantRoleID,
-		)
 		// Create Orga-Team role
 		util.CreateRole(
 			s, g, "Orga-Team", "0x9A58B4",
 			config.ServerConfig.PermissionTemplates.OrgaTeam,
-			false, false, &config.ServerConfig.OrgaTeamRoleID,
+			true, true, &config.ServerConfig.OrgaTeamRoleID,
 		)
 		// Create RoBOT-Admin role
 		util.CreateRole(
 			s, g, "RoBOT-Admin", "0xFF0000",
 			config.ServerConfig.PermissionTemplates.RoBOTAdmin,
-			false, true, &config.ServerConfig.BotAdminRoleID,
+			true, true, &config.ServerConfig.BotAdminRoleID,
 		)
 		// Create role for each team
 		log.Println("Creating roles for teams...")
@@ -66,6 +60,12 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 				true, true, &t.RoleID,
 			)
 		}
+		// Create Participant role
+		util.CreateRole(
+			s, g, "Participant", "0x000000",
+			config.ServerConfig.PermissionTemplates.Participant,
+			false, false, &config.ServerConfig.ParticipantRoleID,
+		)
 
 		createBasicChannels(s, g, ev)
 
