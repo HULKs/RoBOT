@@ -7,6 +7,8 @@ import (
 	"log"
 	"strconv"
 
+	"RoBOT/colors"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -136,4 +138,20 @@ func ErrCheck(err error, logMsg string) {
 // CheckMsgSend is a wrapper for errors.ErrCheck with a msg prefilled for ChannelMessageSend errors
 func CheckMsgSend(err error, gid string, chid string) {
 	ErrCheck(err, fmt.Sprintf("Failed sending message in guild: %s in channel: %s", gid, chid))
+}
+
+// SendProtectedCommandEmbed sends a red Embed to the channel saying a user is using a
+// command in a protected channel
+func SendProtectedCommandEmbed(s *discordgo.Session, chID string) error {
+	_, err := s.ChannelMessageSendEmbed(
+		chID, &discordgo.MessageEmbed{
+			Title: "You are trying to use a command in a protected channel. This command is reserved for meeting organizers. " +
+				"This incident will be reported.",
+			Color: colors.RED,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "If you think this is an error, contact the RoBOT-Admins",
+			},
+		},
+	)
+	return err
 }
