@@ -145,6 +145,8 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 		}, logCategory, ev.Author.Username,
 	)
 	config.ServerConfig.ProtectedChannels[chWelcome.ID] = nil
+	// Save ID to ServerConfig
+	config.ServerConfig.WelcomeChannelID = chWelcome.ID
 	// TODO set welcome as system channel (Doesn't work, field in GuildParams missing)
 
 	// role-assignment
