@@ -14,9 +14,9 @@ import (
 func deleteRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	// ErrCheck if user has permission
 	userPerms, err := s.State.MessagePermissions(ev.Message)
-	util.ErrCheck(err, "[Delete] Failed getting permissions for user "+ev.Author.Mention())
+	util.ErrCheck(err, "[Delete] Failed getting permissions for user "+ev.Author.Username)
 	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
-		log.Printf("[Delete] User %s has no permissions to delete channel!", ev.Author.Mention())
+		log.Printf("[Delete] User %s has no permissions to delete channel!", ev.Author.Username)
 		_, err = s.ChannelMessageSendEmbed(
 			ev.ChannelID, &discordgo.MessageEmbed{
 				Title: "You don't have the necessary permissions to use this command. This incident will be reported.",
@@ -37,12 +37,12 @@ func deleteRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	// Don't continue if we are inside the archive
 	if channel.ParentID == config.ServerConfig.ArchiveCategoryID {
 		log.Printf(
-			"[Delete] User %s tried deleting channel %s but it's in the archive!", ev.Author.Mention(), channel.Mention(),
+			"[Delete] User %s tried deleting channel %s but it's in the archive!", ev.Author.Username, channel.Name,
 		)
 		return
 	}
 
-	log.Printf("[Delete] User %s invoked DELETE in channel %s", ev.Author.Mention(), channel.Mention())
+	log.Printf("[Delete] User %s invoked DELETE in channel %s", ev.Author.Username, channel.Name)
 
 	// Get channels in category (catChs)
 	var catChs []*string
@@ -60,7 +60,7 @@ func deleteRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	for _, ch := range catChs {
 		_, err = s.ChannelDelete(*ch)
 		util.ErrCheck(err, "[Delete] Failed deleting channel "+*ch)
-		log.Printf("[Delete] User %s deleted channel %d", ev.Author.Mention(), ch)
+		log.Printf("[Delete] User %s deleted channel %d", ev.Author.Username, ch)
 	}
 }
 
