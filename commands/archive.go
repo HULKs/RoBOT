@@ -13,9 +13,9 @@ import (
 func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	// ErrCheck if user has permission
 	userPerms, err := s.State.MessagePermissions(ev.Message)
-	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+ev.Author.Mention())
+	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+ev.Author.Username)
 	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
-		log.Printf("[Archive] User %s has no permissions to delete channel!", ev.Author.Mention())
+		log.Printf("[Archive] User %s has no permissions to delete channel!", ev.Author.Username)
 		// TODO Send message to notify user
 		return
 	}
@@ -26,7 +26,7 @@ func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string
 	// Don't continue if we are already archived
 	if channel.ParentID == config.ServerConfig.ArchiveCategoryID {
 		log.Printf(
-			"[Archive] User %s tried archiving channel %s but it's already archived", ev.Author.Mention(), channel.Mention(),
+			"[Archive] User %s tried archiving channel %s but it's already archived", ev.Author.Username, channel.Name,
 		)
 		return
 	}
@@ -50,13 +50,13 @@ func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string
 		},
 	)
 	util.ErrCheck(err, "[Archive] Failed setting Archive category as parent for channel")
-	log.Printf("[Archive] User %s moved channel %s to the archive", ev.Author.Mention(), channel.Mention())
+	log.Printf("[Archive] User %s moved channel %s to the archive", ev.Author.Username, channel.Name)
 
 	// Delete the rest
 	for _, ch := range catChs {
 		_, err = s.ChannelDelete(*ch)
 		util.ErrCheck(err, "[Archive] Failed deleting channel "+*ch)
-		log.Printf("[Archive] User %s deleted channel %d", ev.Author.Mention(), ch)
+		log.Printf("[Archive] User %s deleted channel %d", ev.Author.Username, ch)
 	}
 }
 
