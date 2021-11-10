@@ -10,8 +10,15 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// TODO Send message to channel to say it was archived?
 func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
+	// ErrCheck if user has permission
+	userPerms, err := s.State.MessagePermissions(ev.Message)
+	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+ev.Author.Mention())
+	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
+		log.Printf("[Archive] User %s has no permissions to delete channel!", ev.Author.Mention())
+		// TODO Send message to notify user
+		return
+	}
 	// Get channel
 	channel, err := s.Channel(ev.ChannelID)
 	util.ErrCheck(err, "[Archive] Failed getting channel for ID "+ev.ChannelID)
