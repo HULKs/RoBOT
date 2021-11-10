@@ -87,12 +87,44 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 	)
 
 	// Create Text channel and Voice channel
-	util.CreateChannel(
+	newChannel := util.CreateChannel(
 		s, g, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil, "VoiceStateUpdate", user.Mention(),
 	)
 	chVoice := util.CreateChannel(
 		s, g, "voice", "", catNew.ID, discordgo.ChannelTypeGuildVoice, nil, "VoiceStateUpdate", user.Mention(),
 	)
+
+	// TODO Add more commands
+	// Send welcome message
+	_, err = s.ChannelMessageSendEmbed(
+		newChannel.ID, &discordgo.MessageEmbed{
+			Title:       "Modify your channels with the following commands:",
+			Description: "To use these, you need the \"Manage Channels\" permission in this category. As creator of the meeting, this is the case.",
+			Color:       0,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "For questions regarding the Bot, contact the RoBOT-Admins.",
+			},
+			Image:     nil,
+			Thumbnail: nil,
+			Video:     nil,
+			Provider:  nil,
+			Author:    nil,
+			Fields: []*discordgo.MessageEmbedField{
+				{
+					Name:   fmt.Sprintf("`%srename`", config.RoBotConfig.Prefix),
+					Value:  "With the rename command, you can conveniently rename all channels belonging to your meeting.",
+					Inline: false,
+				},
+				{
+					Name: fmt.Sprintf("`%sarchive`", config.RoBotConfig.Prefix),
+					Value: "With the archive command, you can move your text channel to the archive category after your meeting has ended. " +
+						"If you use the archive command, **ALL OTHER CHANNELS IN THE CATEGORY will be DELETED!** Be careful!",
+					Inline: false,
+				},
+			},
+		},
+	)
+	util.CheckMsgSend(err, g.ID, newChannel.ID)
 
 	// Move user to new channel
 	err = s.GuildMemberMove(g.ID, user.ID, &chVoice.ID)
