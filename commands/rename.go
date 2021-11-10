@@ -13,13 +13,15 @@ import (
 
 // TODO For some reason this only works twice per channel. Don't make too many typos I guess!
 // TODO Answer with message to confirm change
+// TODO Don't do this in the Archive!!!
 
 func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	// ErrCheck if user has permission
 	userPerms, err := s.State.MessagePermissions(ev.Message)
-	util.ErrCheck(err, "[Rename] Failed getting permissions for user "+ev.Author.Username)
+	util.ErrCheck(err, "[Rename] Failed getting permissions for user "+ev.Author.Mention())
 	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
-		log.Printf("[Rename] User %s has no permissions to rename channel!", ev.Author.Username)
+		log.Printf("[Rename] User %s has no permissions to rename channel!", ev.Author.Mention())
+		// TODO Send message to notify user
 		return
 	}
 
@@ -61,10 +63,10 @@ func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 			switch gch.Type {
 			case discordgo.ChannelTypeGuildText:
 				_, err = s.ChannelEdit(gch.ID, newNameText)
-				util.ErrCheck(err, "[Rename] Failed renaming text channel "+gch.Name)
+				util.ErrCheck(err, "[Rename] Failed renaming text channel "+gch.Mention())
 			case discordgo.ChannelTypeGuildVoice:
 				_, err = s.ChannelEdit(gch.ID, newName)
-				util.ErrCheck(err, "[Rename] Failed renaming voice channel "+gch.Name)
+				util.ErrCheck(err, "[Rename] Failed renaming voice channel "+gch.Mention())
 			}
 		}
 	}
