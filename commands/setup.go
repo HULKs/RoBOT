@@ -35,6 +35,9 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		// Delete everything on server
 		deleteChannelsAndRoles(s, g)
 
+		// Reset list of protected channels
+		config.ServerConfig.ProtectedChannels = make(map[string]interface{})
+
 		// Rename server
 		_, err := s.GuildEdit(g.ID, discordgo.GuildParams{Name: config.ServerConfig.EventName})
 		util.ErrCheck(err, "Failed renaming Server")
