@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -84,12 +85,13 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 			),
 		},
 	)
+
 	// Create Text channel and Voice channel
 	util.CreateChannel(
-		s, g, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil,
+		s, g, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil, "VoiceStateUpdate", user.Mention(),
 	)
 	chVoice := util.CreateChannel(
-		s, g, "voice", "", catNew.ID, discordgo.ChannelTypeGuildVoice, nil,
+		s, g, "voice", "", catNew.ID, discordgo.ChannelTypeGuildVoice, nil, "VoiceStateUpdate", user.Mention(),
 	)
 
 	// Move user to new channel

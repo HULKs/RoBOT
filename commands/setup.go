@@ -12,6 +12,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+const logCategory string = "Setup"
+
 func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 
 	// ErrCheck for arguments
@@ -128,8 +130,7 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	// welcome
 	_ = util.CreateChannel(
-		s, g, "welcome", "", "", discordgo.ChannelTypeGuildText,
-		[]*discordgo.PermissionOverwrite{
+		s, g, "welcome", "", "", discordgo.ChannelTypeGuildText, []*discordgo.PermissionOverwrite{
 			// read-only for @everyone
 			{
 				ID:   config.ServerConfig.EveryoneRoleID,
@@ -138,14 +139,13 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 				Allow: discordgo.PermissionViewChannel |
 					discordgo.PermissionReadMessageHistory,
 			},
-		},
+		}, logCategory, "RoBOT-Admin",
 	)
 	// TODO set welcome as system channel (Doesnt work, field in GuildParams missing)
 
 	// role-assignment
 	_ = util.CreateChannel(
-		s, g, "role-assignment", "", "", discordgo.ChannelTypeGuildText,
-		[]*discordgo.PermissionOverwrite{
+		s, g, "role-assignment", "", "", discordgo.ChannelTypeGuildText, []*discordgo.PermissionOverwrite{
 			// write for @everyone
 			{
 				ID:   config.ServerConfig.EveryoneRoleID,
@@ -155,16 +155,15 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 					discordgo.PermissionReadMessageHistory |
 					discordgo.PermissionSendMessages,
 			},
-		},
+		}, logCategory, "RoBOT-Admin",
 	)
 
 	// botcontrol
 	_ = util.CreateChannel(
-		s, g, "botcontrol", "", "", discordgo.ChannelTypeGuildText,
-		util.PermOverwriteHideForAShowForB(
+		s, g, "botcontrol", "", "", discordgo.ChannelTypeGuildText, util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.BotAdminRoleID,
-		),
+		), logCategory, "RoBOT-Admin",
 	)
 
 	// INFORMATION: announcements, links
@@ -176,10 +175,10 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 		),
 	)
 	_ = util.CreateChannel(
-		s, g, "announcements", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
+		s, g, "announcements", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil, logCategory, "RoBOT-Admin",
 	)
 	_ = util.CreateChannel(
-		s, g, "links", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil,
+		s, g, "links", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil, logCategory, "RoBOT-Admin",
 	)
 
 	// TODO more basic channels
@@ -217,14 +216,14 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 		)
 		// Create text channel
 		util.CreateChannel(
-			s, g, t.Name, t.Name+" - Teamzone", catTeamzone.ID,
-			discordgo.ChannelTypeGuildText, nil,
+			s, g, t.Name, t.Name+" - Teamzone", catTeamzone.ID, discordgo.ChannelTypeGuildText, nil, logCategory,
+			"RoBOT-Admin",
 		)
 		// Create voice channels
 		for i := 1; i < 4; i++ {
 			util.CreateChannel(
-				s, g, fmt.Sprintf("Teamzone %02d", i), t.Name+" - Teamzone", catTeamzone.ID,
-				discordgo.ChannelTypeGuildVoice, nil,
+				s, g, fmt.Sprintf("Teamzone %02d", i), t.Name+" - Teamzone", catTeamzone.ID, discordgo.ChannelTypeGuildVoice,
+				nil, logCategory, "RoBOT-Admin",
 			)
 		}
 	}
@@ -239,8 +238,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild) {
 	)
 	// Create channel to create moar channels
 	chMagicVoice := util.CreateChannel(
-		s, g, "Click to create room", "", catMagic.ID,
-		discordgo.ChannelTypeGuildVoice, nil,
+		s, g, "Click to create room", "", catMagic.ID, discordgo.ChannelTypeGuildVoice, nil, logCategory, "RoBOT-Admin",
 	)
 	// Save ID to ServerConfig
 	config.ServerConfig.VoiceChannelCreateID = chMagicVoice.ID

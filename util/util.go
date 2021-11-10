@@ -85,7 +85,7 @@ func CreateCategory(
 // CreateChannel creates a channel with the given properties and returns the channel
 func CreateChannel(
 	s *discordgo.Session, g *discordgo.Guild, name, topic, parentID string, chtype discordgo.ChannelType,
-	permissionOverwrites []*discordgo.PermissionOverwrite,
+	permissionOverwrites []*discordgo.PermissionOverwrite, logCategory, logUser string,
 ) *discordgo.Channel {
 	channel, err := s.GuildChannelCreateComplex(
 		g.ID, discordgo.GuildChannelCreateData{
@@ -97,7 +97,7 @@ func CreateChannel(
 		},
 	)
 	ErrCheck(err, "Failed creating channel "+name)
-	log.Printf("[%s] Created channel: %s", channel.ID, channel.Name)
+	log.Printf("[%s] Created channel: %s for %s", logCategory, channel.Name, logUser)
 
 	return channel
 }
