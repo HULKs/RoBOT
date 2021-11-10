@@ -8,6 +8,8 @@ import (
 	"sort"
 
 	"RoBOT/util"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 var (
@@ -66,4 +68,15 @@ func SaveTeamConfig() {
 		err = ioutil.WriteFile(filename, conf, 0600)
 		util.ErrCheck(err, "Error writing "+filename)
 	}
+}
+
+// IsProtected returns true if channel or its parent is
+// contained in ServerConfig.ProtectedChannels
+func IsProtected(channel *discordgo.Channel) bool {
+	for ID, _ := range ServerConfig.ProtectedChannels {
+		if ID == channel.ID || ID == channel.ParentID {
+			return true
+		}
+	}
+	return false
 }
