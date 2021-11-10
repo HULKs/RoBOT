@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"RoBOT/colors"
 	"RoBOT/commands"
 	"RoBOT/config"
 	"RoBOT/util"
@@ -100,7 +101,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 		newChannel.ID, &discordgo.MessageEmbed{
 			Title:       "Modify your channels with the following commands:",
 			Description: "To use these, you need the \"Manage Channels\" permission in this category. As creator of the meeting, this is the case.",
-			Color:       0,
+			Color:       colors.GREEN,
 			Footer: &discordgo.MessageEmbedFooter{
 				Text: "For questions regarding the Bot, contact the RoBOT-Admins.",
 			},
