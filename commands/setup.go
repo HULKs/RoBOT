@@ -132,7 +132,7 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 
 func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo.MessageCreate) {
 	// welcome
-	_ = util.CreateChannel(
+	chWelcome := util.CreateChannel(
 		s, g, "welcome", "", "", discordgo.ChannelTypeGuildText, []*discordgo.PermissionOverwrite{
 			// read-only for @everyone
 			{
@@ -144,10 +144,11 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 			},
 		}, logCategory, ev.Author.Username,
 	)
-	// TODO set welcome as system channel (Doesnt work, field in GuildParams missing)
+	config.ServerConfig.ProtectedChannels[chWelcome.ID] = nil
+	// TODO set welcome as system channel (Doesn't work, field in GuildParams missing)
 
 	// role-assignment
-	_ = util.CreateChannel(
+	chRoleAssignment := util.CreateChannel(
 		s, g, "role-assignment", "", "", discordgo.ChannelTypeGuildText, []*discordgo.PermissionOverwrite{
 			// write for @everyone
 			{
@@ -160,14 +161,16 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 			},
 		}, logCategory, ev.Author.Username,
 	)
+	config.ServerConfig.ProtectedChannels[chRoleAssignment.ID] = nil
 
 	// botcontrol
-	_ = util.CreateChannel(
+	chBotcontrol := util.CreateChannel(
 		s, g, "botcontrol", "", "", discordgo.ChannelTypeGuildText, util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.BotAdminRoleID,
 		), logCategory, ev.Author.Username,
 	)
+	config.ServerConfig.ProtectedChannels[chBotcontrol.ID] = nil
 
 	// INFORMATION: announcements, links
 	catInformation := util.CreateCategory(
@@ -182,6 +185,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	_ = util.CreateChannel(
 		s, g, "links", "", catInformation.ID, discordgo.ChannelTypeGuildText, nil, logCategory, ev.Author.Username,
 	)
+	config.ServerConfig.ProtectedChannels[catInformation.ID] = nil
 
 	// TODO more basic channels
 	// META: help, feedback
@@ -215,6 +219,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 				},
 			}, logCategory, ev.Author.Username,
 		)
+		config.ServerConfig.ProtectedChannels[catTeamzone.ID] = nil
 		// Create text channel
 		util.CreateChannel(
 			s, g, t.Name, t.Name+" - Teamzone", catTeamzone.ID, discordgo.ChannelTypeGuildText, nil,
@@ -236,6 +241,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 			config.ServerConfig.ParticipantRoleID,
 		), logCategory, ev.Author.Username,
 	)
+	config.ServerConfig.ProtectedChannels[catMagic.ID] = nil
 	// Create channel to create moar channels
 	chMagicVoice := util.CreateChannel(
 		s, g, "Click to create room", "", catMagic.ID, discordgo.ChannelTypeGuildVoice, nil, logCategory,
@@ -253,4 +259,5 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	)
 	// Save to config
 	config.ServerConfig.ArchiveCategoryID = catArchive.ID
+	config.ServerConfig.ProtectedChannels[catArchive.ID] = nil
 }
