@@ -49,7 +49,7 @@ func deleteRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	gChs, err := s.GuildChannels(ev.GuildID)
 	util.ErrCheck(err, "[Archive] Failed getting guild channels")
 	for _, gch := range gChs {
-		if gch.ParentID == channel.ParentID && gch.ID != channel.ID {
+		if gch.ParentID == channel.ParentID {
 			catChs = append(catChs, &gch.ID)
 		}
 	}
