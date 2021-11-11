@@ -155,3 +155,10 @@ func SendProtectedCommandEmbed(s *discordgo.Session, chID string) error {
 	)
 	return err
 }
+
+// HelpEmbedFooter returns a reference to the default "if you need help" embed footer
+func HelpEmbedFooter() *discordgo.MessageEmbedFooter {
+	return &discordgo.MessageEmbedFooter{
+		Text: "If you need help, contact the RoBOT-Admins.",
+	}
+}
