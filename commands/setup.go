@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"RoBOT/colors"
 	"RoBOT/config"
 	"RoBOT/helptexts"
 	"RoBOT/util"
@@ -71,8 +72,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		)
 
 		createBasicChannels(s, g, ev)
-
-		// TODO Send role assignment message
+		sendRoleAssignmentMessage(s, g)
 
 		config.SaveServerConfig()
 		config.SaveTeamConfig()
@@ -264,4 +264,38 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	// Save to config
 	config.ServerConfig.ArchiveCategoryID = catArchive.ID
 	config.ServerConfig.ProtectedChannels[catArchive.ID] = nil
+}
+
+func sendRoleAssignmentMessage(s *discordgo.Session, g *discordgo.Guild) {
+	// Generate Embed with all teams
+	var desc strings.Builder
+	desc.WriteString("```text")
+	for i, team := range config.TeamList {
+		desc.WriteString(fmt.Sprintf("\n%2d: %s", i, team.Name))
+	}
+	desc.WriteString("\n```")
+
+	embed := discordgo.MessageEmbed{
+		Title: "Team Assignment",
+		Description: fmt.Sprintf(
+			"Greetings! You have reached the role assignment channel! "+
+				"To get access to the digital venue, assign yourself a role using the `%steam $TEAMNUMBER` command. "+
+				"The Bot will then assign you to your team and grant you access to the rest of the server.",
+			config.RoBotConfig.Prefix,
+		),
+		Color: colors.GREEN,
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: "If you need help, contact the RoBOT-Admins.",
+		},
+		Image: nil,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:  "Team List",
+				Value: desc.String(),
+			},
+		},
+	}
+
+	_, err := s.ChannelMessageSendEmbed(config.ServerConfig.RoleAssignmentChannelID, &embed)
+	util.ErrCheck(err, "[Setup] Failed sending role assignment message")
 }
