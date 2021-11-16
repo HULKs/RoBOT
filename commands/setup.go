@@ -283,11 +283,9 @@ func sendRoleAssignmentMessage(s *discordgo.Session, g *discordgo.Guild) {
 				"The Bot will then assign you to your team and grant you access to the rest of the server.",
 			config.RoBotConfig.Prefix,
 		),
-		Color: colors.GREEN,
-		Footer: &discordgo.MessageEmbedFooter{
-			Text: "If you need help, contact the RoBOT-Admins.",
-		},
-		Image: nil,
+		Color:  colors.GREEN,
+		Footer: util.HelpEmbedFooter(),
+		Image:  nil, // TODO There should be an image here
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:  "Team List",
