@@ -223,7 +223,10 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 				},
 			}, logCategory, ev.Author.Username,
 		)
+		// Save ID to ProtectedChannels
 		config.ServerConfig.ProtectedChannels[catTeamzone.ID] = nil
+		// Save Teamzone ID to TeamConf entry in config.TeamList
+		t.TeamzoneID = catTeamzone.ID
 		// Create text channel
 		util.CreateChannel(
 			s, g, t.Name, t.Name+" - Teamzone", catTeamzone.ID, discordgo.ChannelTypeGuildText, nil,

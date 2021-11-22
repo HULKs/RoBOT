@@ -8,9 +8,10 @@ type BotConf struct {
 
 // TeamConf represents a json in db/teams
 type TeamConf struct {
-	Name      string `json:"Name"`
-	RoleID    string `json:"RoleID"`
-	TeamColor string `json:"TeamColor"`
+	Name       string `json:"Name"`
+	RoleID     string `json:"RoleID"`
+	TeamzoneID string `json:"TeamzoneID"`
+	TeamColor  string `json:"TeamColor"`
 }
 
 // ServerConf represents db/server.json
