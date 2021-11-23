@@ -117,8 +117,10 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 	// Get all Roles
 	roles, err := s.GuildRoles(g.ID)
 	for _, role := range roles {
+		// If role ID is @everyone, we can't delete this, also we can't delete
+		// the bot's own role, which should have Administrator permissions
 		if role.ID == config.ServerConfig.EveryoneRoleID ||
-			(strings.Contains(role.Name, "RoBOT") && role.Permissions == 8) {
+			((role.Name == s.State.User.Username) && role.Permissions == 8) {
 			continue
 		}
 		// Delete Role
