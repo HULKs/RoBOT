@@ -56,7 +56,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 			true, true, &config.ServerConfig.BotAdminRoleID,
 		)
 		// Create role for each team
-		log.Println("Creating roles for teams...")
+		log.Println("[Setup] Creating roles for teams...")
 		for _, t := range config.TeamList {
 			util.CreateRole(
 				s, g, t.Name, t.TeamColor,
@@ -199,7 +199,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	// GENERAL: town-hall, Voice: Town-Hall, Lounge 01-02, AFK
 
 	// Create teamzone for each team
-	log.Println("Creating teamzones...")
+	log.Println("[Setup] Creating teamzones...")
 	for _, t := range config.TeamList {
 		// Create teamzone category
 		catTeamzone := util.CreateCategory(
