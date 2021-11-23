@@ -80,3 +80,82 @@ func IsProtected(channel *discordgo.Channel) bool {
 	}
 	return false
 }
+
+// SanityCheck checks if the Token and Prefix members have been set (!= "").
+// This does not mean the Token or Prefix are valid!
+func (conf *BotConf) SanityCheck() bool {
+	if conf.Token == "" || conf.Prefix == "" {
+		return false
+	}
+	return true
+}
+
+// SanityCheck checks if the members of ServerConf have been set to valid values.
+func (conf *ServerConf) SanityCheck(s *discordgo.Session) bool {
+	var err error
+
+	// Event Name
+	if conf.EventName == "" {
+		// TODO
+		return false
+	}
+
+	// GuildID
+	_, err = s.Guild(conf.GuildID)
+	if err != nil {
+		// TODO
+		return false
+	}
+
+	// Special channels
+	channels := []string{
+		conf.VoiceChannelCreateID,
+		conf.ArchiveCategoryID,
+		conf.WelcomeChannelID,
+		conf.RoleAssignmentChannelID,
+	}
+	for _, chID := range channels {
+		_, err = s.Channel(chID)
+		if err != nil {
+			// TODO
+			return false
+		}
+	}
+
+	// Protected channels
+	for chID, _ := range conf.ProtectedChannels {
+		_, err = s.Channel(chID)
+		if err != nil {
+			// TODO
+			return false
+		}
+	}
+
+	// Roles
+	guildRoles, err := s.GuildRoles(conf.GuildID)
+	util.ErrCheck(err, "") // TODO
+
+	roles := []string{
+		conf.EveryoneRoleID,
+		conf.ParticipantRoleID,
+		conf.OrgaTeamRoleID,
+		conf.BotAdminRoleID,
+	}
+	// Generate slice of all guild roles
+	var guildRoleIDs []string
+	for _, guildRole := range guildRoles {
+		guildRoleIDs = append(guildRoleIDs, guildRole.ID)
+	}
+	// Check if all roles are in GuildRoleIDs
+	for _, role := range roles {
+		if util.ContainsStr(&guildRoleIDs, &role) {
+			continue
+		}
+		// TODO
+		return false
+	}
+
+	// TODO PermissionTemplates?
+
+	return true
+}
