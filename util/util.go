@@ -162,3 +162,13 @@ func HelpEmbedFooter() *discordgo.MessageEmbedFooter {
 		Text: "If you need help, contact the RoBOT-Admins.",
 	}
 }
+
+// ContainsStr checks if a []string contains searchStr
+func ContainsStr(s *[]string, searchStr *string) bool {
+	for _, str := range *s {
+		if *searchStr == str {
+			return true
+		}
+	}
+	return false
+}
