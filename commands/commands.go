@@ -7,7 +7,7 @@ var (
 
 func init() {
 	commandMap["ping"] = Command{pingRun, pingHelp}
-	commandMap["setup"] = Command{setupRun, setupRun}
+	commandMap["setup"] = Command{setupRun, setupHelp}
 	commandMap["rename"] = Command{renameRun, renameHelp}
 	commandMap["archive"] = Command{archiveRun, archiveHelp}
 	commandMap["delete"] = Command{deleteRun, deleteHelp}
