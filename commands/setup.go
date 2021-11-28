@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"RoBOT/colors"
@@ -76,6 +77,62 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		config.SaveServerConfig()
 		config.SaveTeamConfig()
+	case "repair":
+		// TODO !setup repair
+
+		// Sanity checks for the config to see if manual entries are any good
+		if !config.RoBotConfig.SanityCheck() {
+			log.Println("[Setup/Repair] RoBotConfig.SanityCheck failed! Exiting...")
+			_ = s.Close()
+			os.Exit(1)
+		}
+		if !config.ServerConfig.SanityCheck(s) {
+			log.Println("[Setup/Repair] ServerConfig.SanityCheck failed! Exiting...")
+			_ = s.Close()
+			os.Exit(1)
+		}
+
+		// Participant
+		_, err = s.GuildRoleEdit(
+			g.ID, config.ServerConfig.ParticipantRoleID, "Participant",
+			0, false, config.ServerConfig.PermissionTemplates.Participant,
+			false,
+		)
+		util.ErrCheck(err, "[Setup/Repair] Failed resetting Participant role!")
+
+		// Everyone
+		_, err = s.GuildRoleEdit(
+			g.ID, config.ServerConfig.EveryoneRoleID, "",
+			0, false, config.ServerConfig.PermissionTemplates.Everyone,
+			true,
+		)
+		util.ErrCheck(err, "[Setup/Repair] Failed resetting @everyone role!")
+
+		// RoBOT-Admin
+		_, err = s.GuildRoleEdit(
+			g.ID, config.ServerConfig.RoBOTAdminRoleID, "RoBOT-Admin",
+			0xFF0000, false, config.ServerConfig.PermissionTemplates.RoBOTAdmin,
+			true,
+		)
+		util.ErrCheck(err, "[Setup/Repair] Failed resetting RoBOT-Admin role!")
+
+		// Orga-Team
+		_, err = s.GuildRoleEdit(
+			g.ID, config.ServerConfig.RoBOTAdminRoleID, "Orga-Team",
+			0x9A58B4, true, config.ServerConfig.PermissionTemplates.OrgaTeam,
+			true,
+		)
+		util.ErrCheck(err, "[Setup/Repair] Failed resetting @everyone role!")
+
+		// Here:
+		//   PER TEAM:
+		//   - teamrole check
+		//     - Name, RoleID, TeamzoneID present
+		//     - Permission reset to zero
+		//   - Teamzone permission check
+		// - channel check
+		//   - Name
+		//   - Permission check
 	case "add-team":
 		// TODO
 	case "add-channel":
