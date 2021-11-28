@@ -139,7 +139,7 @@ func (conf *ServerConf) SanityCheck(s *discordgo.Session) bool {
 		conf.EveryoneRoleID,
 		conf.ParticipantRoleID,
 		conf.OrgaTeamRoleID,
-		conf.BotAdminRoleID,
+		conf.RoBOTAdminRoleID,
 	}
 	// Generate slice of all guild roles
 	var guildRoleIDs []string
