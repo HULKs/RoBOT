@@ -53,7 +53,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		util.CreateRole(
 			s, g, "RoBOT-Admin", "0xFF0000",
 			config.ServerConfig.PermissionTemplates.RoBOTAdmin,
-			true, true, &config.ServerConfig.BotAdminRoleID,
+			true, true, &config.ServerConfig.RoBOTAdminRoleID,
 		)
 		// Create role for each team
 		log.Println("[Setup] Creating roles for teams...")
@@ -173,7 +173,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	chBotcontrol := util.CreateChannel(
 		s, g, "botcontrol", "", "", discordgo.ChannelTypeGuildText, util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
-			config.ServerConfig.BotAdminRoleID,
+			config.ServerConfig.RoBOTAdminRoleID,
 		), logCategory, ev.Author.Username,
 	)
 	config.ServerConfig.ProtectedChannels[chBotcontrol.ID] = nil
