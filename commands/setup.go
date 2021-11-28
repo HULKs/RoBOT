@@ -14,6 +14,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// TODO This is stupid
 const logCategory string = "Setup"
 
 func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
