@@ -128,7 +128,10 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 		util.ErrCheck(err, "Failed deleting role "+role.ID)
 	}
 	// Set server-wide permissions for @everyone
-	_, err = s.GuildRoleEdit(g.ID, config.ServerConfig.EveryoneRoleID, "", 0, false, 0, true)
+	_, err = s.GuildRoleEdit(
+		g.ID, config.ServerConfig.EveryoneRoleID, "",
+		0, false, config.ServerConfig.PermissionTemplates.Everyone, true,
+	)
 	util.ErrCheck(err, "Failed setting permissions for @everyone role")
 }
 
