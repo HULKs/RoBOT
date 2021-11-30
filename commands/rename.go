@@ -73,7 +73,7 @@ func renameRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string)
 	)
 	util.ErrCheck(err, "[Rename] Failed renaming category")
 
-	// Get all channels in category
+	// Get all channels in guild
 	guildChannels, err := s.GuildChannels(ev.GuildID)
 	util.ErrCheck(err, "[Rename] Failed getting channels for guild")
 	// Rename all channels with this category as parent
