@@ -79,7 +79,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 				// Add management permissions for meeting organizer
 				&discordgo.PermissionOverwrite{
 					ID:    ev.UserID,
-					Type:  discordgo.PermissionOverwriteTypeRole,
+					Type:  discordgo.PermissionOverwriteTypeMember,
 					Deny:  0,
 					Allow: discordgo.PermissionManageChannels,
 				},
