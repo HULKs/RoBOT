@@ -35,6 +35,8 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 	switch strings.ToLower(args[0]) {
 	case "bootstrap":
+		// This is very destructive
+		return
 		// Delete everything on server
 		deleteChannelsAndRoles(s, g)
 
