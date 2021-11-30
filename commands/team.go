@@ -19,7 +19,8 @@ func teamRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	var (
 		err         error
 		msg         *discordgo.Message
-		teamNum     int64
+		temp        int64
+		teamNum     uint8
 		member      *discordgo.Member
 		team        config.TeamConf
 		newUsername string
@@ -51,7 +52,9 @@ func teamRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 	}
 
 	// Check if team number is an int
-	teamNum, err = strconv.ParseInt(args[0], 0, 32)
+	temp, err = strconv.ParseInt(args[0], 0, 32)
+	teamNum = uint8(temp)
+
 	if err != nil {
 		goto noValidNumber
 	}
