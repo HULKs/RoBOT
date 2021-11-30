@@ -71,7 +71,11 @@ func teamRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
 		util.ErrCheck(err, "[Team] Failed removing role from user "+member.User.ID)
 	}
 
-	// Change Username
+	// Reset Member Nickname
+	err = s.GuildMemberNickname(ev.GuildID, member.User.ID, "")
+	util.ErrCheck(err, "[Team] Failed resetting nickname for member "+member.User.Username)
+
+	// Change Nickname
 	team = *config.TeamList[teamNum]
 	newUsername = fmt.Sprintf(
 		"%.32s", fmt.Sprintf("[%.17s] %s", team.Name, member.User.Username),
