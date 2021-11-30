@@ -78,17 +78,15 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 
 		config.SaveServerConfig()
 		config.SaveTeamConfig()
-	case "repair":
-		// TODO !setup repair
-
+	case "repair-roles":
 		// Sanity checks for the config to see if manual entries are any good
 		if !config.RoBotConfig.SanityCheck() {
-			log.Println("[Setup/Repair] RoBotConfig.SanityCheck failed! Exiting...")
+			log.Println("[Setup/Repair-Roles] RoBotConfig.SanityCheck failed! Exiting...")
 			_ = s.Close()
 			os.Exit(1)
 		}
 		if !config.ServerConfig.SanityCheck(s) {
-			log.Println("[Setup/Repair] ServerConfig.SanityCheck failed! Exiting...")
+			log.Println("[Setup/Repair-Roles] ServerConfig.SanityCheck failed! Exiting...")
 			_ = s.Close()
 			os.Exit(1)
 		}
@@ -99,7 +97,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 			0, false, config.ServerConfig.PermissionTemplates.Participant,
 			false,
 		)
-		util.ErrCheck(err, "[Setup/Repair] Failed resetting Participant role!")
+		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting Participant role!")
 
 		// Everyone
 		_, err = s.GuildRoleEdit(
@@ -107,7 +105,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 			0, false, config.ServerConfig.PermissionTemplates.Everyone,
 			true,
 		)
-		util.ErrCheck(err, "[Setup/Repair] Failed resetting @everyone role!")
+		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
 
 		// RoBOT-Admin
 		_, err = s.GuildRoleEdit(
@@ -115,7 +113,7 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 			0xFF0000, false, config.ServerConfig.PermissionTemplates.RoBOTAdmin,
 			true,
 		)
-		util.ErrCheck(err, "[Setup/Repair] Failed resetting RoBOT-Admin role!")
+		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting RoBOT-Admin role!")
 
 		// Orga-Team
 		_, err = s.GuildRoleEdit(
@@ -123,8 +121,9 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 			0x9A58B4, true, config.ServerConfig.PermissionTemplates.OrgaTeam,
 			true,
 		)
-		util.ErrCheck(err, "[Setup/Repair] Failed resetting @everyone role!")
-
+		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
+	case "repair-channels":
+		// TODO
 		// Here:
 		//   PER TEAM:
 		//   - teamrole check
