@@ -137,6 +137,8 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		// TODO
 	case "add-channel":
 		// TODO
+	case "ramsg":
+		sendRoleAssignmentMessage(s, g)
 	}
 }
 
