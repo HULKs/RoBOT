@@ -129,7 +129,7 @@ func PermOverwriteHideForAShowForB(A, B string) []*discordgo.PermissionOverwrite
 // ErrCheck panics with an error message if err != nil
 func ErrCheck(err error, logMsg string) {
 	if err != nil {
-		log.Panicf("[ERROR] %s", logMsg)
+		log.Panicf("[ERROR] %s ERROR: %s", logMsg, err)
 	}
 }
 
