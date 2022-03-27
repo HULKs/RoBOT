@@ -22,6 +22,7 @@ var (
 )
 
 // TODO Add logging
+// TODO the path should be a cmdline flag
 
 func init() {
 	// Load the config db
