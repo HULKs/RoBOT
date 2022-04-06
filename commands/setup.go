@@ -244,7 +244,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 
 	// INFORMATION: announcements, links
 	catInformation := util.CreateCategory(
-		s, g, "Information", "", util.PermOverwriteHideForAShowForB(
+		s, guildID, "Information", "", util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.ParticipantRoleID,
 		), logCategory, ev.Author.Username,
@@ -269,7 +269,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 	for _, t := range config.TeamList {
 		// Create teamzone category
 		catTeamzone := util.CreateCategory(
-			s, g, t.Name, t.Name+" - Teamzone", []*discordgo.PermissionOverwrite{
+			s, guildID, t.Name, t.Name+" - Teamzone", []*dg.PermissionOverwrite{
 				// Hide for @everyone
 				{
 					ID:   config.ServerConfig.EveryoneRoleID,
@@ -309,7 +309,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 
 	// Create category for magic voice channels
 	catMagic := util.CreateCategory(
-		s, g, "Create Meetings", "", util.PermOverwriteHideForAShowForB(
+		s, guildID, "Create Meetings", "", util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.ParticipantRoleID,
 		), logCategory, ev.Author.Username,
@@ -325,7 +325,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 
 	// Create Archive category
 	catArchive := util.CreateCategory(
-		s, g, "Archive", "Archived channels", util.PermOverwriteHideForAShowForB(
+		s, guildID, "Archive", "Archived channels", util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.ParticipantRoleID,
 		), logCategory, ev.Author.Username,

@@ -67,12 +67,12 @@ func CreateRole(
 
 // CreateCategory creates a category with the given properties and returns the channel struct
 func CreateCategory(
-	s *discordgo.Session, g *discordgo.Guild, name, topic string, permissionOverwrites []*discordgo.PermissionOverwrite,
+	s *discordgo.Session, guildID, name, topic string, permissionOverwrites []*discordgo.PermissionOverwrite,
 	logCategory, logUser string,
 ) *discordgo.Channel {
 	// Create category
 	category, err := s.GuildChannelCreateComplex(
-		g.ID, discordgo.GuildChannelCreateData{
+		guildID, discordgo.GuildChannelCreateData{
 			Name:                 name,
 			Type:                 discordgo.ChannelTypeGuildCategory,
 			Topic:                topic,
