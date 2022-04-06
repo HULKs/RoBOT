@@ -8,44 +8,21 @@ import (
 
 	"RoBOT/colors"
 	"RoBOT/config"
-	"RoBOT/helptexts"
 	"RoBOT/util"
 
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 )
 
-// TODO This is stupid
-const logCategory string = "Setup"
+func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
+	// Delete everything on server
+	deleteChannelsAndRoles(s, guildID)
 
-func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
+	// Reset list of protected channels
+	config.ServerConfig.ProtectedChannels = make(map[string]interface{})
 
-	// ErrCheck for arguments
-	if len(args) == 0 {
-		msg, err := s.ChannelMessageSend(ev.ChannelID, "You didn't give any arguments!")
-		util.CheckMsgSend(err, msg.GuildID, msg.ChannelID)
-		return
-	}
-
-	// Get guild ID and save to ServerConfig
-	g, err := s.Guild(ev.GuildID)
-	util.ErrCheck(err, "Error getting guild for ID "+ev.GuildID)
-	config.ServerConfig.GuildID = g.ID
-
-	getEveryoneRoleID(s, g)
-
-	switch strings.ToLower(args[0]) {
-	case "bootstrap":
-		// This is very destructive
-		return
-		// Delete everything on server
-		deleteChannelsAndRoles(s, g)
-
-		// Reset list of protected channels
-		config.ServerConfig.ProtectedChannels = make(map[string]interface{})
-
-		// Rename server
-		_, err := s.GuildEdit(g.ID, discordgo.GuildParams{Name: config.ServerConfig.EventName})
-		util.ErrCheck(err, "Failed renaming Server")
+	// Rename server
+	_, err := s.GuildEdit(guildID, dg.GuildParams{Name: config.ServerConfig.EventName})
+	util.ErrCheck(err, "Failed renaming Server")
 
 	// Create Orga-Team role
 	util.CreateRole(
@@ -75,11 +52,26 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		false, false, &config.ServerConfig.ParticipantRoleID,
 	)
 
-		createBasicChannels(s, g, ev)
-		sendRoleAssignmentMessage(s, g)
+	createBasicChannels(s, guildID, i.Member.Nick)
+	sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 
-		config.SaveServerConfig()
-		config.SaveTeamConfig()
+	config.SaveServerConfig()
+	config.SaveTeamConfig()
+}
+
+// TODO This is stupid
+const logCategory string = "Setup"
+
+func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
+
+	// Get guild ID and save to ServerConfig
+	g, err := s.Guild(ev.GuildID)
+	util.ErrCheck(err, "Error getting guild for ID "+ev.GuildID)
+	config.ServerConfig.GuildID = g.ID
+
+	getEveryoneRoleID(s, g)
+
+	switch strings.ToLower(args[0]) {
 	case "repair-roles":
 		// Sanity checks for the config to see if manual entries are any good
 		if !config.RoBotConfig.SanityCheck() {
@@ -140,17 +132,12 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 	case "add-channel":
 		// TODO
 	case "ramsg":
-		sendRoleAssignmentMessage(s, g)
+		sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 	}
 }
 
-func setupHelp(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
-	_, err := s.ChannelMessageSend(ev.ChannelID, helptexts.DB["ping"])
-	util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
-}
-
 // getEveryoneRoleID saves the ID for the @everyone role to the ServerConfig
-func getEveryoneRoleID(s *discordgo.Session, g *discordgo.Guild) {
+func getEveryoneRoleID(s *dg.Session, g *dg.Guild) {
 	// TODO Add logging
 	// Get roles for guild
 	roles, err := s.GuildRoles(g.ID)
@@ -165,18 +152,18 @@ func getEveryoneRoleID(s *discordgo.Session, g *discordgo.Guild) {
 	panic("Could not find a role named \"@everyone\"")
 }
 
-func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
+func deleteChannelsAndRoles(s *dg.Session, guildID string) {
 	// TODO Add logging
 	// Get all channels in server
-	channels, err := s.GuildChannels(g.ID)
-	util.ErrCheck(err, "Failed to get channels for ID "+g.ID)
+	channels, err := s.GuildChannels(guildID)
+	util.ErrCheck(err, "Failed to get channels for ID "+guildID)
 	// Delete all channels
 	for _, channel := range channels {
 		_, err = s.ChannelDelete(channel.ID)
 		util.ErrCheck(err, "Failed deleting channel "+channel.ID)
 	}
 	// Get all Roles
-	roles, err := s.GuildRoles(g.ID)
+	roles, err := s.GuildRoles(guildID)
 	for _, role := range roles {
 		// If role ID is @everyone, we can't delete this, also we can't delete
 		// the bot's own role, which should have Administrator permissions
@@ -185,30 +172,30 @@ func deleteChannelsAndRoles(s *discordgo.Session, g *discordgo.Guild) {
 			continue
 		}
 		// Delete Role
-		err = s.GuildRoleDelete(g.ID, role.ID)
+		err = s.GuildRoleDelete(guildID, role.ID)
 		util.ErrCheck(err, "Failed deleting role "+role.ID)
 	}
 	// Set server-wide permissions for @everyone
 	_, err = s.GuildRoleEdit(
-		g.ID, config.ServerConfig.EveryoneRoleID, "",
+		guildID, config.ServerConfig.EveryoneRoleID, "",
 		0, false, config.ServerConfig.PermissionTemplates.Everyone, true,
 	)
 	util.ErrCheck(err, "Failed setting permissions for @everyone role")
 }
 
-func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo.MessageCreate) {
+func createBasicChannels(s *dg.Session, guildID, memberNick string) {
 	// welcome
 	chWelcome := util.CreateChannel(
 		s, guildID, "welcome", "", "", dg.ChannelTypeGuildText, []*dg.PermissionOverwrite{
 			// read-only for @everyone
 			{
 				ID:   config.ServerConfig.EveryoneRoleID,
-				Type: discordgo.PermissionOverwriteTypeRole,
+				Type: dg.PermissionOverwriteTypeRole,
 				Deny: 0,
-				Allow: discordgo.PermissionViewChannel |
-					discordgo.PermissionReadMessageHistory,
+				Allow: dg.PermissionViewChannel |
+					dg.PermissionReadMessageHistory,
 			},
-		}, logCategory, ev.Author.Username,
+		}, logCategory, memberNick,
 	)
 	config.ServerConfig.ProtectedChannels[chWelcome.ID] = nil
 	// Save ID to ServerConfig
@@ -221,13 +208,13 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 			// write for @everyone
 			{
 				ID:   config.ServerConfig.EveryoneRoleID,
-				Type: discordgo.PermissionOverwriteTypeRole,
+				Type: dg.PermissionOverwriteTypeRole,
 				Deny: 0,
-				Allow: discordgo.PermissionViewChannel |
-					discordgo.PermissionReadMessageHistory |
-					discordgo.PermissionSendMessages,
+				Allow: dg.PermissionViewChannel |
+					dg.PermissionReadMessageHistory |
+					dg.PermissionSendMessages,
 			},
-		}, logCategory, ev.Author.Username,
+		}, logCategory, memberNick,
 	)
 	config.ServerConfig.ProtectedChannels[chRoleAssignment.ID] = nil
 	// Save ID to ServerConfig
@@ -238,7 +225,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 		s, guildID, "botcontrol", "", "", dg.ChannelTypeGuildText, util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.RoBOTAdminRoleID,
-		), logCategory, ev.Author.Username,
+		), logCategory, memberNick,
 	)
 	config.ServerConfig.ProtectedChannels[chBotcontrol.ID] = nil
 
@@ -247,7 +234,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 		s, guildID, "Information", "", util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.ParticipantRoleID,
-		), logCategory, ev.Author.Username,
+		), logCategory, memberNick,
 	)
 	_ = util.CreateChannel(
 		s, guildID, "announcements", "", catInformation.ID, dg.ChannelTypeGuildText, nil, logCategory, memberNick,
@@ -273,21 +260,21 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 				// Hide for @everyone
 				{
 					ID:   config.ServerConfig.EveryoneRoleID,
-					Type: discordgo.PermissionOverwriteTypeRole,
-					Deny: discordgo.PermissionViewChannel |
-						discordgo.PermissionVoiceConnect,
+					Type: dg.PermissionOverwriteTypeRole,
+					Deny: dg.PermissionViewChannel |
+						dg.PermissionVoiceConnect,
 					Allow: 0,
 				},
 				// All permissions for team
 				{
 					ID:   t.RoleID,
-					Type: discordgo.PermissionOverwriteTypeRole,
+					Type: dg.PermissionOverwriteTypeRole,
 					Deny: 0,
-					Allow: discordgo.PermissionViewChannel |
-						discordgo.PermissionVoiceConnect |
-						discordgo.PermissionManageChannels,
+					Allow: dg.PermissionViewChannel |
+						dg.PermissionVoiceConnect |
+						dg.PermissionManageChannels,
 				},
-			}, logCategory, ev.Author.Username,
+			}, logCategory, memberNick,
 		)
 		// Save ID to ProtectedChannels
 		config.ServerConfig.ProtectedChannels[catTeamzone.ID] = nil
@@ -312,7 +299,7 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 		s, guildID, "Create Meetings", "", util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.ParticipantRoleID,
-		), logCategory, ev.Author.Username,
+		), logCategory, memberNick,
 	)
 	config.ServerConfig.ProtectedChannels[catMagic.ID] = nil
 	// Create channel to create moar channels
@@ -328,14 +315,14 @@ func createBasicChannels(s *discordgo.Session, g *discordgo.Guild, ev *discordgo
 		s, guildID, "Archive", "Archived channels", util.PermOverwriteHideForAShowForB(
 			config.ServerConfig.EveryoneRoleID,
 			config.ServerConfig.ParticipantRoleID,
-		), logCategory, ev.Author.Username,
+		), logCategory, memberNick,
 	)
 	// Save to config
 	config.ServerConfig.ArchiveCategoryID = catArchive.ID
 	config.ServerConfig.ProtectedChannels[catArchive.ID] = nil
 }
 
-func sendRoleAssignmentMessage(s *discordgo.Session, g *discordgo.Guild) {
+func sendRoleAssignmentMessage(s *dg.Session, channelID string) {
 	// Generate Embed with all teams
 	var desc strings.Builder
 	desc.WriteString("```text")
@@ -344,7 +331,7 @@ func sendRoleAssignmentMessage(s *discordgo.Session, g *discordgo.Guild) {
 	}
 	desc.WriteString("\n```")
 
-	embed := discordgo.MessageEmbed{
+	embed := dg.MessageEmbed{
 		Title: "Team Assignment",
 		Description: fmt.Sprintf(
 			"Greetings! You have reached the role assignment channel! "+
@@ -355,7 +342,7 @@ func sendRoleAssignmentMessage(s *discordgo.Session, g *discordgo.Guild) {
 		Color:  colors.GREEN,
 		Footer: util.HelpEmbedFooter(),
 		Image:  nil, // TODO There should be an image here
-		Fields: []*discordgo.MessageEmbedField{
+		Fields: []*dg.MessageEmbedField{
 			{
 				Name:  "Team List",
 				Value: desc.String(),
@@ -363,6 +350,6 @@ func sendRoleAssignmentMessage(s *discordgo.Session, g *discordgo.Guild) {
 		},
 	}
 
-	_, err := s.ChannelMessageSendEmbed(config.ServerConfig.RoleAssignmentChannelID, &embed)
+	_, err := s.ChannelMessageSendEmbed(channelID, &embed)
 	util.ErrCheck(err, "[Setup] Failed sending role assignment message")
 }
