@@ -47,33 +47,33 @@ func setupRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) 
 		_, err := s.GuildEdit(g.ID, discordgo.GuildParams{Name: config.ServerConfig.EventName})
 		util.ErrCheck(err, "Failed renaming Server")
 
-		// Create Orga-Team role
+	// Create Orga-Team role
+	util.CreateRole(
+		s, guildID, "Orga-Team", "0x9A58B4",
+		config.ServerConfig.PermissionTemplates.OrgaTeam,
+		true, true, &config.ServerConfig.OrgaTeamRoleID,
+	)
+	// Create RoBOT-Admin role
+	util.CreateRole(
+		s, guildID, "RoBOT-Admin", "0xFF0000",
+		config.ServerConfig.PermissionTemplates.RoBOTAdmin,
+		true, true, &config.ServerConfig.RoBOTAdminRoleID,
+	)
+	// Create role for each team
+	log.Println("[Setup] Creating roles for teams...")
+	for _, t := range config.TeamList {
 		util.CreateRole(
-			s, g, "Orga-Team", "0x9A58B4",
-			config.ServerConfig.PermissionTemplates.OrgaTeam,
-			true, true, &config.ServerConfig.OrgaTeamRoleID,
+			s, guildID, t.Name, t.TeamColor,
+			config.ServerConfig.PermissionTemplates.TeamRole,
+			true, true, &t.RoleID,
 		)
-		// Create RoBOT-Admin role
-		util.CreateRole(
-			s, g, "RoBOT-Admin", "0xFF0000",
-			config.ServerConfig.PermissionTemplates.RoBOTAdmin,
-			true, true, &config.ServerConfig.RoBOTAdminRoleID,
-		)
-		// Create role for each team
-		log.Println("[Setup] Creating roles for teams...")
-		for _, t := range config.TeamList {
-			util.CreateRole(
-				s, g, t.Name, t.TeamColor,
-				config.ServerConfig.PermissionTemplates.TeamRole,
-				true, true, &t.RoleID,
-			)
-		}
-		// Create Participant role
-		util.CreateRole(
-			s, g, "Participant", "0x000000",
-			config.ServerConfig.PermissionTemplates.Participant,
-			false, false, &config.ServerConfig.ParticipantRoleID,
-		)
+	}
+	// Create Participant role
+	util.CreateRole(
+		s, guildID, "Participant", "0x000000",
+		config.ServerConfig.PermissionTemplates.Participant,
+		false, false, &config.ServerConfig.ParticipantRoleID,
+	)
 
 		createBasicChannels(s, g, ev)
 		sendRoleAssignmentMessage(s, g)
