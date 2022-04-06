@@ -87,11 +87,11 @@ func CreateCategory(
 
 // CreateChannel creates a channel with the given properties and returns the channel
 func CreateChannel(
-	s *discordgo.Session, g *discordgo.Guild, name, topic, parentID string, chtype discordgo.ChannelType,
+	s *discordgo.Session, guildID, name, topic, parentID string, chtype discordgo.ChannelType,
 	permissionOverwrites []*discordgo.PermissionOverwrite, logCategory, logUser string,
 ) *discordgo.Channel {
 	channel, err := s.GuildChannelCreateComplex(
-		g.ID, discordgo.GuildChannelCreateData{
+		guildID, discordgo.GuildChannelCreateData{
 			Name:                 name,
 			Topic:                topic,
 			Type:                 chtype,

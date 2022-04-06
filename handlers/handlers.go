@@ -58,10 +58,10 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 
 	// Create Text channel and Voice channel
 	newChannel := util.CreateChannel(
-		s, g, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil, "VoiceStateUpdate", user.Mention(),
+		s, g.ID, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil, "VoiceStateUpdate", user.Mention(),
 	)
 	chVoice := util.CreateChannel(
-		s, g, "voice", "", catNew.ID, discordgo.ChannelTypeGuildVoice, nil, "VoiceStateUpdate", user.Mention(),
+		s, g.ID, "voice", "", catNew.ID, discordgo.ChannelTypeGuildVoice, nil, "VoiceStateUpdate", user.Mention(),
 	)
 
 	// TODO Add more commands
