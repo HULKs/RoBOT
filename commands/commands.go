@@ -67,6 +67,10 @@ var Commands = []*dg.ApplicationCommand{
 			},
 		},
 	},
+	{
+		Name:        "archive",
+		Description: "Archive your event channel",
+	},
 }
 
 var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
@@ -135,6 +139,17 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 				Type: dg.InteractionResponseChannelMessageWithSource,
 				Data: &dg.InteractionResponseData{
 					Content: "Renamed to: " + newName,
+				},
+			},
+		)
+	},
+	"archive": func(s *dg.Session, i *dg.InteractionCreate) {
+		archiveChannel(s, i.Interaction)
+		s.InteractionRespond(
+			i.Interaction, &dg.InteractionResponse{
+				Type: dg.InteractionResponseChannelMessageWithSource,
+				Data: &dg.InteractionResponseData{
+					Content: "Channel archived.",
 				},
 			},
 		)

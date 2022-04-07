@@ -5,56 +5,57 @@ import (
 
 	"RoBOT/colors"
 	"RoBOT/config"
-	"RoBOT/helptexts"
 	"RoBOT/util"
 
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 )
 
-func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
+func archiveChannel(s *dg.Session, i *dg.Interaction) {
+	// TODO This should only delete other channels when it's just one text channel left
+
 	var err error
 
 	// Get channel
-	channel, err := s.Channel(ev.ChannelID)
-	util.ErrCheck(err, "[Archive] Failed getting channel for ID "+ev.ChannelID)
+	channel, err := s.Channel(i.ChannelID)
+	util.ErrCheck(err, "[Archive] Failed getting channel for ID "+i.ChannelID)
 
 	// Check if inside protected channel
 	if config.IsProtected(channel) {
-		log.Printf("[Archive] User %s tried archive in a protected channel %s !", ev.Author.Username, channel.Name)
-		err = util.SendProtectedCommandEmbed(s, ev.ChannelID)
-		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
+		log.Printf("[Archive] User %s tried archive in a protected channel %s !", i.Member.User.String(), channel.Name)
+		err = util.SendProtectedCommandEmbed(s, i.ChannelID)
+		util.CheckMsgSend(err, i.GuildID, i.ChannelID)
 		return
 	}
 
 	// ErrCheck if user has permission
-	userPerms, err := s.State.MessagePermissions(ev.Message)
-	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+ev.Author.Username)
-	if userPerms&discordgo.PermissionManageChannels != discordgo.PermissionManageChannels {
-		log.Printf("[Archive] User %s has no permissions to archive channel!", ev.Author.Username)
+	userPerms, err := s.State.UserChannelPermissions(i.Member.User.ID, i.ChannelID)
+	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+i.Member.User.String())
+	if userPerms&dg.PermissionManageChannels != dg.PermissionManageChannels {
+		log.Printf("[Archive] User %s has no permissions to archive channel!", i.Member.User.String())
 		_, err = s.ChannelMessageSendEmbed(
-			ev.ChannelID, &discordgo.MessageEmbed{
+			i.ChannelID, &dg.MessageEmbed{
 				Title: "You don't have the necessary permissions to use this command. This incident will be reported.",
 				Color: colors.RED,
-				Footer: &discordgo.MessageEmbedFooter{
+				Footer: &dg.MessageEmbedFooter{
 					Text: "If you think this is an error, contact the RoBOT-Admins",
 				},
 			},
 		)
-		util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
+		util.CheckMsgSend(err, i.GuildID, i.ChannelID)
 		return
 	}
 
 	// Don't continue if we are already archived
 	if channel.ParentID == config.ServerConfig.ArchiveCategoryID {
 		log.Printf(
-			"[Archive] User %s tried archiving channel %s but it's already archived", ev.Author.Username, channel.Name,
+			"[Archive] User %s tried archiving channel %s but it's already archived", i.Member.User.String(), channel.Name,
 		)
 		return
 	}
 
 	// Get other channels in category (catChs)
 	var catChs []*string
-	gChs, err := s.GuildChannels(ev.GuildID)
+	gChs, err := s.GuildChannels(i.GuildID)
 	util.ErrCheck(err, "[Archive] Failed getting guild channels")
 	for _, gch := range gChs {
 		if gch.ParentID == channel.ParentID && gch.ID != channel.ID {
@@ -66,22 +67,17 @@ func archiveRun(s *discordgo.Session, ev *discordgo.MessageCreate, args []string
 
 	// Move to archive
 	_, err = s.ChannelEditComplex(
-		channel.ID, &discordgo.ChannelEdit{
+		channel.ID, &dg.ChannelEdit{
 			ParentID: config.ServerConfig.ArchiveCategoryID,
 		},
 	)
 	util.ErrCheck(err, "[Archive] Failed setting Archive category as parent for channel")
-	log.Printf("[Archive] User %s moved channel %s to the archive", ev.Author.Username, channel.Name)
+	log.Printf("[Archive] User %s moved channel %s to the archive", i.Member.User.String(), channel.Name)
 
 	// Delete the rest
 	for _, ch := range catChs {
 		_, err = s.ChannelDelete(*ch)
 		util.ErrCheck(err, "[Archive] Failed deleting channel "+*ch)
-		log.Printf("[Archive] User %s deleted channel %d", ev.Author.Username, ch)
+		log.Printf("[Archive] User %s deleted channel %d", i.Member.User.String(), ch)
 	}
-}
-
-func archiveHelp(s *discordgo.Session, ev *discordgo.MessageCreate, args []string) {
-	_, err := s.ChannelMessageSend(ev.ChannelID, helptexts.DB["ping"])
-	util.CheckMsgSend(err, ev.GuildID, ev.ChannelID)
 }
