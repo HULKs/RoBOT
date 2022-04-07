@@ -134,8 +134,6 @@ func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
 		// TODO
 	case "add-channel":
 		// TODO
-	case "ramsg":
-		sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 	}
 }
 

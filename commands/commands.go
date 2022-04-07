@@ -48,6 +48,11 @@ var Commands = []*dg.ApplicationCommand{
 				Description: "Reset role permissions to values specified in config",
 				Type:        dg.ApplicationCommandOptionSubCommand,
 			},
+			{
+				Name:        "role-assignment-message",
+				Description: "Send the role assignment message to the role-assignment channel",
+				Type:        dg.ApplicationCommandOptionSubCommand,
+			},
 		},
 	},
 }
@@ -97,6 +102,16 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 				},
 			)
 			setupRepairRoles(s, i.GuildID, i)
+		case "role-assignment-message":
+			s.InteractionRespond(
+				i.Interaction, &dg.InteractionResponse{
+					Type: dg.InteractionResponseChannelMessageWithSource,
+					Data: &dg.InteractionResponseData{
+						Content: "Sending role-assignment message...",
+					},
+				},
+			)
+			sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 		default:
 		}
 	},
