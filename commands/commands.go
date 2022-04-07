@@ -63,7 +63,7 @@ var Commands = []*dg.ApplicationCommand{
 		Description: "Archive your event channel",
 	},
 	{
-		Name:        "Delete",
+		Name:        "delete",
 		Description: "Delete your event channel",
 	},
 }
