@@ -25,9 +25,9 @@ var Commands = []*dg.ApplicationCommand{
 		Description: "Assign yourself to a team",
 		Options: []*dg.ApplicationCommandOption{
 			{
-				Type:        dg.ApplicationCommandOptionInteger,
 				Name:        "team-number",
 				Description: "Number of the team you want to assign yourself to",
+				Type:        dg.ApplicationCommandOptionInteger,
 				MinValue:    new(float64),
 				MaxValue:    float64(len(config.TeamList)),
 				Required:    true,
@@ -52,6 +52,18 @@ var Commands = []*dg.ApplicationCommand{
 				Name:        "role-assignment-message",
 				Description: "Send the role assignment message to the role-assignment channel",
 				Type:        dg.ApplicationCommandOptionSubCommand,
+			},
+		},
+	},
+	{
+		Name:        "rename",
+		Description: "Rename your event category, text- and voicechannels",
+		Options: []*dg.ApplicationCommandOption{
+			{
+				Name:        "new-name",
+				Description: "The new name for your channels",
+				Type:        dg.ApplicationCommandOptionString,
+				Required:    true,
 			},
 		},
 	},
@@ -114,5 +126,17 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 			sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 		default:
 		}
+	},
+	"rename": func(s *dg.Session, i *dg.InteractionCreate) {
+		newName := i.ApplicationCommandData().Options[0].StringValue()
+		renameChannel(s, i.Interaction, newName)
+		s.InteractionRespond(
+			i.Interaction, &dg.InteractionResponse{
+				Type: dg.InteractionResponseChannelMessageWithSource,
+				Data: &dg.InteractionResponseData{
+					Content: "Renamed to: " + newName,
+				},
+			},
+		)
 	},
 }
