@@ -139,15 +139,15 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 		)
 	},
 	"archive": func(s *dg.Session, i *dg.InteractionCreate) {
-		archiveChannel(s, i.Interaction)
 		s.InteractionRespond(
 			i.Interaction, &dg.InteractionResponse{
 				Type: dg.InteractionResponseChannelMessageWithSource,
 				Data: &dg.InteractionResponseData{
-					Content: "Channel archived.",
+					Content: "Archiving channel...",
 				},
 			},
 		)
+		archiveChannel(s, i.Interaction)
 	},
 	"delete": func(s *dg.Session, i *dg.InteractionCreate) {
 		s.InteractionRespond(
