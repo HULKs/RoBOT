@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -23,21 +24,27 @@ var (
 
 // TODO Add logging
 // TODO the path should be a cmdline flag
+var (
+	DB_PATH       = "db-dev"
+	DB_CONFIGJSON = path.Join(DB_PATH, "config.json")
+	DB_SERVERJSON = path.Join(DB_PATH, "server.json")
+	DB_TEAMS_PATH = path.Join(DB_PATH, "teams")
+)
 
 func init() {
 	// Load the config db
-	util.LoadJSON("db/config.json", &RoBotConfig)
-	util.LoadJSON("db/server.json", &ServerConfig)
+	util.LoadJSON(DB_CONFIGJSON, &RoBotConfig)
+	util.LoadJSON(DB_SERVERJSON, &ServerConfig)
 	// Ensure ProtectedChannels is not nil
 	if ServerConfig.ProtectedChannels == nil {
 		ServerConfig.ProtectedChannels = make(map[string]interface{})
 	}
-	loadTeamConfigs("db/teams")
+	loadTeamConfigs(DB_TEAMS_PATH)
 }
 
 func loadTeamConfigs(dir string) {
 	dirEntries, err := os.ReadDir(dir)
-	util.ErrCheck(err, "Failed to ls db")
+	util.ErrCheck(err, "Failed to ls "+dir)
 	for _, file := range dirEntries {
 		if !file.Type().IsRegular() {
 			continue
@@ -56,8 +63,8 @@ func loadTeamConfigs(dir string) {
 func SaveServerConfig() {
 	conf, err := json.Marshal(ServerConfig)
 	util.ErrCheck(err, "Failed to marshal ServerConfig")
-	err = ioutil.WriteFile("db/server.json", conf, 0600)
-	util.ErrCheck(err, "Error writing db/server.json")
+	err = ioutil.WriteFile(DB_SERVERJSON, conf, 0600)
+	util.ErrCheck(err, fmt.Sprintf("Error writing %s", DB_SERVERJSON))
 }
 
 func SaveTeamConfig() {
@@ -65,9 +72,9 @@ func SaveTeamConfig() {
 		conf, err := json.Marshal(team)
 		util.ErrCheck(err, "Failed marshaling team "+team.Name)
 
-		filename := "db/teams/" + team.Name + ".json"
-		err = ioutil.WriteFile(filename, conf, 0600)
-		util.ErrCheck(err, "Error writing "+filename)
+		filepath := path.Join(DB_TEAMS_PATH, team.Name+".json")
+		err = ioutil.WriteFile(filepath, conf, 0600)
+		util.ErrCheck(err, "Error writing "+filepath)
 	}
 }
 
