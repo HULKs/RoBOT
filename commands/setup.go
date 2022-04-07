@@ -13,6 +13,9 @@ import (
 	dg "github.com/bwmarrin/discordgo"
 )
 
+// TODO This is stupid
+const logCategory string = "Setup"
+
 func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	// Delete everything on server
 	deleteChannelsAndRoles(s, guildID)
