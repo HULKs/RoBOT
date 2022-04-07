@@ -57,7 +57,7 @@ func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 		false, false, &config.ServerConfig.ParticipantRoleID,
 	)
 
-	createBasicChannels(s, guildID, fmt.Sprintf("%s#%s", i.Member.User.Username, i.Member.User.Discriminator))
+	createBasicChannels(s, guildID, i.Member.User.String())
 	sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 
 	config.SaveServerConfig()
