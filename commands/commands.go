@@ -43,6 +43,11 @@ var Commands = []*dg.ApplicationCommand{
 				Description: "!DESTRUCTIVE! Bootstrap the server from scratch",
 				Type:        dg.ApplicationCommandOptionSubCommand,
 			},
+			{
+				Name:        "repair-roles",
+				Description: "Reset role permissions to values specified in config",
+				Type:        dg.ApplicationCommandOptionSubCommand,
+			},
 		},
 	},
 }
@@ -82,6 +87,16 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 				},
 			)
 			setupBootstrap(s, i.GuildID, i)
+		case "repair-roles":
+			s.InteractionRespond(
+				i.Interaction, &dg.InteractionResponse{
+					Type: dg.InteractionResponseChannelMessageWithSource,
+					Data: &dg.InteractionResponseData{
+						Content: "Repairing roles...",
+					},
+				},
+			)
+			setupRepairRoles(s, i.GuildID, i)
 		default:
 		}
 	},
