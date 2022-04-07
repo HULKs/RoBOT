@@ -6,10 +6,6 @@ import (
 	dg "github.com/bwmarrin/discordgo"
 )
 
-// func init() {
-// 	commandMap["delete"] = Command{deleteRun, deleteHelp}
-// }
-
 var Commands = []*dg.ApplicationCommand{
 	{
 		Name:        "ping",
@@ -65,6 +61,10 @@ var Commands = []*dg.ApplicationCommand{
 	{
 		Name:        "archive",
 		Description: "Archive your event channel",
+	},
+	{
+		Name:        "Delete",
+		Description: "Delete your event channel",
 	},
 }
 
@@ -148,5 +148,16 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 				},
 			},
 		)
+	},
+	"delete": func(s *dg.Session, i *dg.InteractionCreate) {
+		s.InteractionRespond(
+			i.Interaction, &dg.InteractionResponse{
+				Type: dg.InteractionResponseChannelMessageWithSource,
+				Data: &dg.InteractionResponseData{
+					Content: "Deleting channel...",
+				},
+			},
+		)
+		deleteChannel(s, i.Interaction)
 	},
 }
