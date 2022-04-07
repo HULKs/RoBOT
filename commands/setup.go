@@ -17,6 +17,8 @@ import (
 const logCategory string = "Setup"
 
 func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
+	// Get role ID for @everyone
+	getEveryoneRoleID(s, guildID)
 	// Delete everything on server
 	deleteChannelsAndRoles(s, guildID)
 
@@ -62,63 +64,61 @@ func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	config.SaveTeamConfig()
 }
 
-// TODO This is stupid
-const logCategory string = "Setup"
+func setupRepairRoles(s *dg.Session, guildID string, i *dg.InteractionCreate) {
+	var err error
+
+	// Sanity checks for the config to see if manual entries are any good
+	if !config.RoBotConfig.SanityCheck() {
+		log.Println("[Setup/Repair-Roles] RoBotConfig.SanityCheck failed! Exiting...")
+		_ = s.Close()
+		os.Exit(1)
+	}
+	if !config.ServerConfig.SanityCheck(s) {
+		log.Println("[Setup/Repair-Roles] ServerConfig.SanityCheck failed! Exiting...")
+		_ = s.Close()
+		os.Exit(1)
+	}
+
+	// Participant
+	_, err = s.GuildRoleEdit(
+		guildID, config.ServerConfig.ParticipantRoleID, "Participant",
+		0, false, config.ServerConfig.PermissionTemplates.Participant,
+		false,
+	)
+	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting Participant role!")
+
+	// Everyone
+	_, err = s.GuildRoleEdit(
+		guildID, config.ServerConfig.EveryoneRoleID, "",
+		0, false, config.ServerConfig.PermissionTemplates.Everyone,
+		true,
+	)
+	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
+
+	// RoBOT-Admin
+	_, err = s.GuildRoleEdit(
+		guildID, config.ServerConfig.RoBOTAdminRoleID, "RoBOT-Admin",
+		0xFF0000, false, config.ServerConfig.PermissionTemplates.RoBOTAdmin,
+		true,
+	)
+	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting RoBOT-Admin role!")
+
+	// Orga-Team
+	_, err = s.GuildRoleEdit(
+		guildID, config.ServerConfig.RoBOTAdminRoleID, "Orga-Team",
+		0x9A58B4, true, config.ServerConfig.PermissionTemplates.OrgaTeam,
+		true,
+	)
+	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
+}
 
 func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
-
 	// Get guild ID and save to ServerConfig
 	g, err := s.Guild(ev.GuildID)
 	util.ErrCheck(err, "Error getting guild for ID "+ev.GuildID)
 	config.ServerConfig.GuildID = g.ID
 
-	getEveryoneRoleID(s, g)
-
 	switch strings.ToLower(args[0]) {
-	case "repair-roles":
-		// Sanity checks for the config to see if manual entries are any good
-		if !config.RoBotConfig.SanityCheck() {
-			log.Println("[Setup/Repair-Roles] RoBotConfig.SanityCheck failed! Exiting...")
-			_ = s.Close()
-			os.Exit(1)
-		}
-		if !config.ServerConfig.SanityCheck(s) {
-			log.Println("[Setup/Repair-Roles] ServerConfig.SanityCheck failed! Exiting...")
-			_ = s.Close()
-			os.Exit(1)
-		}
-
-		// Participant
-		_, err = s.GuildRoleEdit(
-			g.ID, config.ServerConfig.ParticipantRoleID, "Participant",
-			0, false, config.ServerConfig.PermissionTemplates.Participant,
-			false,
-		)
-		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting Participant role!")
-
-		// Everyone
-		_, err = s.GuildRoleEdit(
-			g.ID, config.ServerConfig.EveryoneRoleID, "",
-			0, false, config.ServerConfig.PermissionTemplates.Everyone,
-			true,
-		)
-		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
-
-		// RoBOT-Admin
-		_, err = s.GuildRoleEdit(
-			g.ID, config.ServerConfig.RoBOTAdminRoleID, "RoBOT-Admin",
-			0xFF0000, false, config.ServerConfig.PermissionTemplates.RoBOTAdmin,
-			true,
-		)
-		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting RoBOT-Admin role!")
-
-		// Orga-Team
-		_, err = s.GuildRoleEdit(
-			g.ID, config.ServerConfig.RoBOTAdminRoleID, "Orga-Team",
-			0x9A58B4, true, config.ServerConfig.PermissionTemplates.OrgaTeam,
-			true,
-		)
-		util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
 	case "repair-channels":
 		// TODO
 		// Here:
@@ -140,11 +140,11 @@ func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
 }
 
 // getEveryoneRoleID saves the ID for the @everyone role to the ServerConfig
-func getEveryoneRoleID(s *dg.Session, g *dg.Guild) {
+func getEveryoneRoleID(s *dg.Session, guildID string) {
 	// TODO Add logging
 	// Get roles for guild
-	roles, err := s.GuildRoles(g.ID)
-	util.ErrCheck(err, "Error getting roles for "+g.Name)
+	roles, err := s.GuildRoles(guildID)
+	util.ErrCheck(err, "Error getting roles for guild ID: "+guildID)
 	// Get ID for @everyone
 	for _, role := range roles {
 		if role.Name == "@everyone" {
