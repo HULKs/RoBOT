@@ -11,7 +11,7 @@ import (
 )
 
 func archiveChannel(s *dg.Session, i *dg.Interaction) {
-	// TODO This should only delete other channels when it's just one text channel left
+	// TODO This should only archive one and only delete other channels when it's just one text channel left
 
 	var err error
 
