@@ -43,7 +43,7 @@ func main() {
 	for i, c := range commands.Commands {
 		// TODO This won't work on first run? config isn't populated yet?
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, config.ServerConfig.GuildID, c)
-		util.ErrCheck(err, fmt.Sprintf("Cannot create '%cmd' command", c.Name))
+		util.ErrCheck(err, fmt.Sprintf("Cannot create '%s' command", c.Name))
 		registeredCommands[i] = cmd
 	}
 
