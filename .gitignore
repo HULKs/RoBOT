@@ -1,4 +1,7 @@
 .idea/
-db/
-db-dev/
-RoBOT
+/db/
+/db-dev/
+
+/RoBOT
+
+.DS_Store
