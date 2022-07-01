@@ -22,18 +22,18 @@ func deleteChannel(s *dg.Session, i *dg.Interaction) {
 	// Check if inside protected channel
 	if config.IsProtected(channel) {
 		log.Printf("[Delete] User %s tried delete in protected channel %s !", i.Member.User.String(), channel.Name)
-		err = util.SendProtectedCommandEmbed(s, i.ChannelID)
-		util.CheckMsgSend(err, i.GuildID, i.ChannelID)
+		err = util.SendProtectedCommandEmbed(s, channel.ID)
+		util.CheckMsgSend(err, channel.Name)
 		return
 	}
 
 	// ErrCheck if user has permission
-	userPerms, err := s.State.UserChannelPermissions(i.Member.User.ID, i.ChannelID)
+	userPerms, err := s.State.UserChannelPermissions(i.Member.User.ID, channel.ID)
 	util.ErrCheck(err, "[Delete] Failed getting permissions for user "+i.Member.User.String())
 	if userPerms&dg.PermissionManageChannels != dg.PermissionManageChannels {
 		log.Printf("[Delete] User %s has no permissions to delete channel!", i.Member.User.String())
 		_, err = s.ChannelMessageSendEmbed(
-			i.ChannelID, &dg.MessageEmbed{
+			channel.ID, &dg.MessageEmbed{
 				Title: "You don't have the necessary permissions to use this command. This incident will be reported.",
 				Color: colors.RED,
 				Footer: &dg.MessageEmbedFooter{
@@ -41,7 +41,7 @@ func deleteChannel(s *dg.Session, i *dg.Interaction) {
 				},
 			},
 		)
-		util.CheckMsgSend(err, i.GuildID, i.ChannelID)
+		util.CheckMsgSend(err, channel.Name)
 		return
 	}
 
@@ -71,6 +71,6 @@ func deleteChannel(s *dg.Session, i *dg.Interaction) {
 	for _, ch := range catChs {
 		_, err = s.ChannelDelete(*ch)
 		util.ErrCheck(err, "[Delete] Failed deleting channel "+*ch)
-		log.Printf("[Delete] User %s deleted channel %d", i.Member.User.String(), ch)
+		log.Printf("[Delete] User %s deleted channel %s", i.Member.User.String(), *ch)
 	}
 }

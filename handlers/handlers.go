@@ -100,7 +100,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 			},
 		},
 	)
-	util.CheckMsgSend(err, g.ID, newChannel.ID)
+	util.CheckMsgSend(err, newChannel.ID)
 
 	// Move user to new channel
 	err = s.GuildMemberMove(g.ID, user.ID, &chVoice.ID)

@@ -22,18 +22,18 @@ func archiveChannel(s *dg.Session, i *dg.Interaction) {
 	// Check if inside protected channel
 	if config.IsProtected(channel) {
 		log.Printf("[Archive] User %s tried archive in a protected channel %s !", i.Member.User.String(), channel.Name)
-		err = util.SendProtectedCommandEmbed(s, i.ChannelID)
-		util.CheckMsgSend(err, i.GuildID, i.ChannelID)
+		err = util.SendProtectedCommandEmbed(s, channel.ID)
+		util.CheckMsgSend(err, channel.Name)
 		return
 	}
 
 	// ErrCheck if user has permission
-	userPerms, err := s.State.UserChannelPermissions(i.Member.User.ID, i.ChannelID)
+	userPerms, err := s.State.UserChannelPermissions(i.Member.User.ID, channel.ID)
 	util.ErrCheck(err, "[Archive] Failed getting permissions for user "+i.Member.User.String())
 	if userPerms&dg.PermissionManageChannels != dg.PermissionManageChannels {
 		log.Printf("[Archive] User %s has no permissions to archive channel!", i.Member.User.String())
 		_, err = s.ChannelMessageSendEmbed(
-			i.ChannelID, &dg.MessageEmbed{
+			channel.ID, &dg.MessageEmbed{
 				Title: "You don't have the necessary permissions to use this command. This incident will be reported.",
 				Color: colors.RED,
 				Footer: &dg.MessageEmbedFooter{
@@ -41,7 +41,7 @@ func archiveChannel(s *dg.Session, i *dg.Interaction) {
 				},
 			},
 		)
-		util.CheckMsgSend(err, i.GuildID, i.ChannelID)
+		util.CheckMsgSend(err, channel.ID)
 		return
 	}
 
