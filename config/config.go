@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -20,26 +21,41 @@ var (
 	ServerConfig ServerConf
 	// TeamList represents the teams for this server
 	TeamList []*TeamConf
+
+	// CLI flags
+	configPath string
+	help       bool
+
+	// DB paths, filled in config.init()
+	dbPath, dbConfigjson, dbServerjson, dbTeamsPath string
 )
 
 // TODO Add logging
-// TODO the path should be a cmdline flag
-var (
-	DB_PATH       = "db-dev"
-	DB_CONFIGJSON = path.Join(DB_PATH, "config.json")
-	DB_SERVERJSON = path.Join(DB_PATH, "server.json")
-	DB_TEAMS_PATH = path.Join(DB_PATH, "teams")
-)
 
 func init() {
+	// Parse CLI flags
+	flag.StringVar(&configPath, "c", "", "Path pointing to the configuration db")
+	flag.BoolVar(&help, "h", false, "Show help message")
+	flag.Parse()
+	if help {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	// Fill DB paths
+	dbPath = configPath
+	dbConfigjson = path.Join(dbPath, "config.json")
+	dbServerjson = path.Join(dbPath, "server.json")
+	dbTeamsPath = path.Join(dbPath, "teams")
+
 	// Load the config db
-	util.LoadJSON(DB_CONFIGJSON, &RoBotConfig)
-	util.LoadJSON(DB_SERVERJSON, &ServerConfig)
+	util.LoadJSON(dbConfigjson, &RoBotConfig)
+	util.LoadJSON(dbServerjson, &ServerConfig)
 	// Ensure ProtectedChannels is not nil
 	if ServerConfig.ProtectedChannels == nil {
 		ServerConfig.ProtectedChannels = make(map[string]interface{})
 	}
-	loadTeamConfigs(DB_TEAMS_PATH)
+	loadTeamConfigs(dbTeamsPath)
 }
 
 func loadTeamConfigs(dir string) {
@@ -63,8 +79,8 @@ func loadTeamConfigs(dir string) {
 func SaveServerConfig() {
 	conf, err := json.Marshal(ServerConfig)
 	util.ErrCheck(err, "Failed to marshal ServerConfig")
-	err = ioutil.WriteFile(DB_SERVERJSON, conf, 0600)
-	util.ErrCheck(err, fmt.Sprintf("Error writing %s", DB_SERVERJSON))
+	err = ioutil.WriteFile(dbServerjson, conf, 0600)
+	util.ErrCheck(err, fmt.Sprintf("Error writing %s", dbServerjson))
 }
 
 func SaveTeamConfig() {
@@ -72,7 +88,7 @@ func SaveTeamConfig() {
 		conf, err := json.Marshal(team)
 		util.ErrCheck(err, "Failed marshaling team "+team.Name)
 
-		filepath := path.Join(DB_TEAMS_PATH, team.Name+".json")
+		filepath := path.Join(dbTeamsPath, team.Name+".json")
 		err = ioutil.WriteFile(filepath, conf, 0600)
 		util.ErrCheck(err, "Error writing "+filepath)
 	}
