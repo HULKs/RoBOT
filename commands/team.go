@@ -31,7 +31,7 @@ func assignMemberToTeam(s *dg.Session, member *dg.Member, team *config.TeamConf,
 	)
 	err = s.GuildMemberNickname(guildID, member.User.ID, newUsername)
 	if err != nil {
-		log.Printf("[Team] Failed changing Username for member: %s", member.User.Username)
+		log.Printf("[Team] Failed changing nickname for member: %s", member.User.Username)
 	}
 
 	// Assign Participant and Teamrole
