@@ -48,7 +48,8 @@ func archiveChannel(s *dg.Session, i *dg.Interaction) {
 	// Don't continue if we are already archived
 	if channel.ParentID == config.ServerConfig.ArchiveCategoryID {
 		log.Printf(
-			"[Archive] User %s tried archiving channel %s but it's already archived", i.Member.User.String(), channel.Name,
+			"[Archive] User %s tried archiving channel %s but it's already archived", i.Member.User.String(),
+			channel.Name,
 		)
 		return
 	}

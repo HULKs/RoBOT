@@ -289,7 +289,8 @@ func createBasicChannels(s *dg.Session, guildID, memberNick string) {
 		// Create voice channels
 		for i := 1; i < 4; i++ {
 			util.CreateChannel(
-				s, guildID, fmt.Sprintf("Teamzone %02d", i), t.Name+" - Teamzone", catTeamzone.ID, dg.ChannelTypeGuildVoice,
+				s, guildID, fmt.Sprintf("Teamzone %02d", i), t.Name+" - Teamzone", catTeamzone.ID,
+				dg.ChannelTypeGuildVoice,
 				nil, logCategory, memberNick,
 			)
 		}
