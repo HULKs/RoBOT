@@ -169,7 +169,7 @@ func deleteChannelsAndRoles(s *dg.Session, guildID string) {
 		// If role ID is @everyone, we can't delete this, also we can't delete
 		// the bot's own role, which should have Administrator permissions
 		if role.ID == config.ServerConfig.EveryoneRoleID ||
-			((role.Name == s.State.User.Username) && role.Permissions == 8) {
+			((role.Name == s.State.User.Username) && role.Permissions == dg.PermissionAdministrator) {
 			continue
 		}
 		// Delete Role
