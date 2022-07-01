@@ -116,5 +116,5 @@ func Ready(s *discordgo.Session, _ *discordgo.Ready) {
 	err := s.UpdateGameStatus(0, "with gophers...")
 	util.ErrCheck(err, "Failed setting custom status")
 	// Log Username
-	log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
+	log.Printf("Logged in as: %s", s.State.User.String())
 }
