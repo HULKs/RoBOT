@@ -335,10 +335,9 @@ func sendRoleAssignmentMessage(s *dg.Session, channelID string) {
 	embed := dg.MessageEmbed{
 		Title: "Team Assignment",
 		Description: fmt.Sprintf(
-			"Greetings! You have reached the role assignment channel! "+
-				"To get access to the digital venue, assign yourself a role using the `%steam TEAMNUMBER` command. "+
-				"The Bot will then assign you to your team and grant you access to the rest of the server.",
-			config.RoBotConfig.Prefix,
+			"Greetings! You have reached the team assignment channel! " +
+				"To get access to the digital venue, select a team using the `/team` command. " +
+				"The Bot will then assign you and grant you access to the rest of the server.",
 		),
 		Color:  colors.GREEN,
 		Footer: util.HelpEmbedFooter(),
