@@ -28,33 +28,36 @@ func ParseHexColor(hex string) (int, error) {
 	return int(i), err
 }
 
-// CreateRole creates a new role with the given properties
+// CreateRole creates a new role with the given properties.
 func CreateRole(
-	s *discordgo.Session, guildID, name, hexColor string, perm int64,
-	hoist, mention bool, configRef *string,
+	s *discordgo.Session, guildID, name, hexColor string, permissions int64,
+	hoist, mentionable bool, configRef *string,
 ) *discordgo.Role {
+	// Parse color
+	color, err := ParseHexColor(hexColor)
+	ErrCheck(err, "Failed to parse color from "+hexColor+" for role "+name)
+
 	// Create Role
-	role, err := s.GuildRoleCreate(guildID)
+	role, err := s.GuildRoleCreate(
+		guildID, &discordgo.RoleParams{
+			Name:        name,
+			Color:       &color,
+			Hoist:       &hoist,
+			Permissions: &permissions,
+			Mentionable: &mentionable,
+		},
+	)
 	ErrCheck(err, "Failed to create Role \""+name+"\"")
-	log.Printf("[%s] Created Role (%s)", role.ID, name)
+	log.Printf(
+		"[%s] Created Role (Name: %s, Color: %s, Perm: %d, Hoist: %t, Mention: %t)",
+		role.ID, name, hexColor, permissions, hoist, mentionable,
+	)
 
 	// Add Role ID to config
 	if configRef != nil {
 		*configRef = role.ID
 	}
 	log.Printf("[%s] Saved ID to config (%s)", role.ID, name)
-
-	// Parse color
-	col, err := ParseHexColor(hexColor)
-	ErrCheck(err, "Failed to parse color from "+hexColor+" for role "+name)
-
-	// Edit Role, set name and permissions
-	_, err = s.GuildRoleEdit(guildID, role.ID, name, col, hoist, perm, mention)
-	ErrCheck(err, "Failed to edit Role \""+name+"\"")
-	log.Printf(
-		"[%s] Edited Role (Name: %s, Color: %s, Perm: %d, Hoist: %t, Mention: %t)",
-		role.ID, name, hexColor, perm, hoist, mention,
-	)
 
 	return role
 }
