@@ -167,3 +167,17 @@ func ContainsStr(s *[]string, searchStr *string) bool {
 	}
 	return false
 }
+
+// PointyInt returns a pointer to an int with value i
+func PointyInt(i int) *int {
+	x := new(int)
+	*x = i
+	return x
+}
+
+// PointyBool returns a pointer to a bool with value b
+func PointyBool(b bool) *bool {
+	x := new(bool)
+	*x = b
+	return x
+}
