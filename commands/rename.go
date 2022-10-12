@@ -74,10 +74,10 @@ func renameChannel(s *dg.Session, i *dg.Interaction, newName string) {
 		if gch.ParentID == parent.ID {
 			switch gch.Type {
 			case dg.ChannelTypeGuildText:
-				_, err = s.ChannelEdit(gch.ID, newNameText)
+				_, err = s.ChannelEdit(gch.ID, &dg.ChannelEdit{Name: newNameText})
 				util.ErrCheck(err, "[Rename] Failed renaming text channel "+gch.Name)
 			case dg.ChannelTypeGuildVoice:
-				_, err = s.ChannelEdit(gch.ID, newName)
+				_, err = s.ChannelEdit(gch.ID, &dg.ChannelEdit{Name: newName})
 				util.ErrCheck(err, "[Rename] Failed renaming voice channel "+gch.Name)
 			}
 		}
