@@ -16,6 +16,15 @@ import (
 )
 
 func main() {
+	// Print license notice
+	fmt.Printf(
+		"RoBOT Copyright (C) 2020-2022 HULKs e.V.\n" +
+			"This program comes with ABSOLUTELY NO WARRANTY.\n" +
+			"This is free software, and you are welcome to redistribute\n" +
+			"it under certain conditions.\n" +
+			"See https://www.gnu.org/licenses/gpl-3.0.html for details.\n\n",
+	)
+
 	// Create a new Discord session using the provided bot token
 	s, err := dg.New("Bot " + config.RoBotConfig.Token)
 	util.ErrCheck(err, "Error creating Discord session")
