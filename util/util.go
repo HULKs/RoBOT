@@ -3,8 +3,8 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
 
 	"RoBOT/colors"
@@ -15,7 +15,7 @@ import (
 // LoadJSON loads the json file into target
 func LoadJSON(path string, target interface{}) {
 	// Read []byte from file
-	dat, err := ioutil.ReadFile(path)
+	dat, err := os.ReadFile(path)
 	ErrCheck(err, "Error reading from file")
 	// Parse json
 	err = json.Unmarshal(dat, &target)
