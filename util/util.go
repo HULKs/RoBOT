@@ -22,12 +22,6 @@ func LoadJSON(path string, target interface{}) {
 	ErrCheck(err, "Failed to parse json")
 }
 
-func ParseTeamColor(name, hex string) int {
-	tc, err := strconv.ParseInt(hex, 0, 0)
-	ErrCheck(err, "Failed to parse TeamColor for team "+name)
-	return int(tc)
-}
-
 // ParseHexColor converts a hex RGB color of format "0x000000" code to an int
 func ParseHexColor(hex string) (int, error) {
 	i, err := strconv.ParseInt(hex, 0, 0)
