@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"sort"
@@ -79,7 +78,7 @@ func loadTeamConfigs(dir string) {
 func SaveServerConfig() {
 	conf, err := json.Marshal(ServerConfig)
 	util.ErrCheck(err, "Failed to marshal ServerConfig")
-	err = ioutil.WriteFile(dbServerjson, conf, 0600)
+	err = os.WriteFile(dbServerjson, conf, 0600)
 	util.ErrCheck(err, fmt.Sprintf("Error writing %s", dbServerjson))
 }
 
@@ -89,7 +88,7 @@ func SaveTeamConfig() {
 		util.ErrCheck(err, "Failed marshaling team "+team.Name)
 
 		filepath := path.Join(dbTeamsPath, team.Name+".json")
-		err = ioutil.WriteFile(filepath, conf, 0600)
+		err = os.WriteFile(filepath, conf, 0600)
 		util.ErrCheck(err, "Error writing "+filepath)
 	}
 }
