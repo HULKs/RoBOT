@@ -1,7 +1,6 @@
 .idea/
-/db/
-/db-dev/
-
-/RoBOT
+db/
+db-dev/
 
 .DS_Store
+RoBOT
