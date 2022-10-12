@@ -26,7 +26,7 @@ func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	config.ServerConfig.ProtectedChannels = make(map[string]interface{})
 
 	// Rename server
-	_, err := s.GuildEdit(guildID, dg.GuildParams{Name: config.ServerConfig.EventName})
+	_, err := s.GuildEdit(guildID, &dg.GuildParams{Name: config.ServerConfig.EventName})
 	util.ErrCheck(err, "Failed renaming Server")
 
 	// Create Orga-Team role
