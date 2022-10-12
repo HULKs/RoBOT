@@ -81,33 +81,49 @@ func setupRepairRoles(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 
 	// Participant
 	_, err = s.GuildRoleEdit(
-		guildID, config.ServerConfig.ParticipantRoleID, "Participant",
-		0, false, config.ServerConfig.PermissionTemplates.Participant,
-		false,
+		guildID, config.ServerConfig.ParticipantRoleID, &dg.RoleParams{
+			Name:        "Participant",
+			Color:       util.PointyInt(0),
+			Hoist:       util.PointyBool(false),
+			Permissions: &config.ServerConfig.PermissionTemplates.Participant,
+			Mentionable: util.PointyBool(false),
+		},
 	)
 	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting Participant role!")
 
 	// Everyone
 	_, err = s.GuildRoleEdit(
-		guildID, config.ServerConfig.EveryoneRoleID, "",
-		0, false, config.ServerConfig.PermissionTemplates.Everyone,
-		true,
+		guildID, config.ServerConfig.EveryoneRoleID, &dg.RoleParams{
+			Name:        "",
+			Color:       util.PointyInt(0),
+			Hoist:       util.PointyBool(false),
+			Permissions: &config.ServerConfig.PermissionTemplates.Everyone,
+			Mentionable: util.PointyBool(true),
+		},
 	)
 	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
 
 	// RoBOT-Admin
 	_, err = s.GuildRoleEdit(
-		guildID, config.ServerConfig.RoBOTAdminRoleID, "RoBOT-Admin",
-		0xFF0000, false, config.ServerConfig.PermissionTemplates.RoBOTAdmin,
-		true,
+		guildID, config.ServerConfig.RoBOTAdminRoleID, &dg.RoleParams{
+			Name:        "RoBOT-Admin",
+			Color:       util.PointyInt(0xFF0000),
+			Hoist:       util.PointyBool(false),
+			Permissions: &config.ServerConfig.PermissionTemplates.RoBOTAdmin,
+			Mentionable: util.PointyBool(true),
+		},
 	)
 	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting RoBOT-Admin role!")
 
 	// Orga-Team
 	_, err = s.GuildRoleEdit(
-		guildID, config.ServerConfig.RoBOTAdminRoleID, "Orga-Team",
-		0x9A58B4, true, config.ServerConfig.PermissionTemplates.OrgaTeam,
-		true,
+		guildID, config.ServerConfig.RoBOTAdminRoleID, &dg.RoleParams{
+			Name:        "Orga-Team",
+			Color:       util.PointyInt(0x9A58B4),
+			Hoist:       util.PointyBool(true),
+			Permissions: &config.ServerConfig.PermissionTemplates.OrgaTeam,
+			Mentionable: util.PointyBool(true),
+		},
 	)
 	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
 }
@@ -178,8 +194,13 @@ func deleteChannelsAndRoles(s *dg.Session, guildID string) {
 	}
 	// Set server-wide permissions for @everyone
 	_, err = s.GuildRoleEdit(
-		guildID, config.ServerConfig.EveryoneRoleID, "",
-		0, false, config.ServerConfig.PermissionTemplates.Everyone, true,
+		guildID, config.ServerConfig.EveryoneRoleID, &dg.RoleParams{
+			Name:        "",
+			Color:       util.PointyInt(0),
+			Hoist:       util.PointyBool(false),
+			Permissions: &config.ServerConfig.PermissionTemplates.Everyone,
+			Mentionable: util.PointyBool(true),
+		},
 	)
 	util.ErrCheck(err, "Failed setting permissions for @everyone role")
 }
