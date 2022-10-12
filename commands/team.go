@@ -35,11 +35,11 @@ func assignMemberToTeam(s *dg.Session, member *dg.Member, team *config.TeamConf,
 	}
 
 	// Assign Participant and Teamrole
-	err = s.GuildMemberEdit(
-		guildID, member.User.ID, []string{
-			config.ServerConfig.ParticipantRoleID,
-			team.RoleID,
-		},
-	)
-	util.ErrCheck(err, "[Team] Failed assigning roles for user "+member.User.Username)
+	for _, roleID := range []string{
+		config.ServerConfig.ParticipantRoleID,
+		team.RoleID,
+	} {
+		err = s.GuildMemberRoleAdd(guildID, member.User.ID, roleID)
+		util.ErrCheck(err, "[Team] Failed assigning roles for user "+member.User.Username)
+	}
 }
