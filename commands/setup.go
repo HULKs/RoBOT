@@ -43,7 +43,7 @@ func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
 
 func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	// Get role ID for @everyone
-	getEveryoneRoleID(s, guildID)
+	saveEveryoneRoleID(s, guildID)
 	// Delete everything on server
 	deleteChannelsAndRoles(s, guildID)
 
@@ -184,8 +184,8 @@ func setupRoleAssignmentMessage(s *dg.Session, channelID string) {
 	util.ErrCheck(err, "[Setup] Failed sending role assignment message")
 }
 
-// getEveryoneRoleID saves the ID for the @everyone role to the ServerConfig
-func getEveryoneRoleID(s *dg.Session, guildID string) {
+// saveEveryoneRoleID saves the ID for the @everyone role to the ServerConfig
+func saveEveryoneRoleID(s *dg.Session, guildID string) {
 	// TODO Add logging
 	// Get roles for guild
 	roles, err := s.GuildRoles(guildID)
