@@ -16,6 +16,31 @@ import (
 // TODO This is stupid
 const logCategory string = "Setup"
 
+func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
+	// Get guild ID and save to ServerConfig
+	g, err := s.Guild(ev.GuildID)
+	util.ErrCheck(err, "Error getting guild for ID "+ev.GuildID)
+	config.ServerConfig.GuildID = g.ID
+
+	switch strings.ToLower(args[0]) {
+	case "repair-channels":
+		// TODO
+		// Here:
+		//   PER TEAM:
+		//   - teamrole check
+		//     - Name, RoleID, TeamzoneID present
+		//     - Permission reset to zero
+		//   - Teamzone permission check
+		// - channel check
+		//   - Name
+		//   - Permission check
+	case "add-team":
+		// TODO
+	case "add-channel":
+		// TODO
+	}
+}
+
 func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	// Get role ID for @everyone
 	getEveryoneRoleID(s, guildID)
@@ -58,7 +83,7 @@ func setupBootstrap(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	)
 
 	createBasicChannels(s, guildID, i.Member.User.String())
-	sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
+	setupRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 
 	config.SaveServerConfig()
 	config.SaveTeamConfig()
@@ -128,29 +153,35 @@ func setupRepairRoles(s *dg.Session, guildID string, i *dg.InteractionCreate) {
 	util.ErrCheck(err, "[Setup/Repair-Roles] Failed resetting @everyone role!")
 }
 
-func setupRun(s *dg.Session, ev *dg.MessageCreate, args []string) {
-	// Get guild ID and save to ServerConfig
-	g, err := s.Guild(ev.GuildID)
-	util.ErrCheck(err, "Error getting guild for ID "+ev.GuildID)
-	config.ServerConfig.GuildID = g.ID
-
-	switch strings.ToLower(args[0]) {
-	case "repair-channels":
-		// TODO
-		// Here:
-		//   PER TEAM:
-		//   - teamrole check
-		//     - Name, RoleID, TeamzoneID present
-		//     - Permission reset to zero
-		//   - Teamzone permission check
-		// - channel check
-		//   - Name
-		//   - Permission check
-	case "add-team":
-		// TODO
-	case "add-channel":
-		// TODO
+func setupRoleAssignmentMessage(s *dg.Session, channelID string) {
+	// Generate Embed with all teams
+	var desc strings.Builder
+	desc.WriteString("```text")
+	for i, team := range config.TeamList {
+		desc.WriteString(fmt.Sprintf("\n%2d: %s", i, team.Name))
 	}
+	desc.WriteString("\n```")
+
+	embed := dg.MessageEmbed{
+		Title: "Team Assignment",
+		Description: fmt.Sprintf(
+			"Greetings! You have reached the team assignment channel! " +
+				"To get access to the digital venue, select a team using the `/team` command. " +
+				"The Bot will then assign you and grant you access to the rest of the server.",
+		),
+		Color:  colors.GREEN,
+		Footer: util.HelpEmbedFooter(),
+		Image:  nil, // TODO There should be an image here
+		Fields: []*dg.MessageEmbedField{
+			{
+				Name:  "Team List",
+				Value: desc.String(),
+			},
+		},
+	}
+
+	_, err := s.ChannelMessageSendEmbed(channelID, &embed)
+	util.ErrCheck(err, "[Setup] Failed sending role assignment message")
 }
 
 // getEveryoneRoleID saves the ID for the @everyone role to the ServerConfig
@@ -343,35 +374,4 @@ func createBasicChannels(s *dg.Session, guildID, memberNick string) {
 	// Save to config
 	config.ServerConfig.ArchiveCategoryID = catArchive.ID
 	config.ServerConfig.ProtectedChannels[catArchive.ID] = nil
-}
-
-func sendRoleAssignmentMessage(s *dg.Session, channelID string) {
-	// Generate Embed with all teams
-	var desc strings.Builder
-	desc.WriteString("```text")
-	for i, team := range config.TeamList {
-		desc.WriteString(fmt.Sprintf("\n%2d: %s", i, team.Name))
-	}
-	desc.WriteString("\n```")
-
-	embed := dg.MessageEmbed{
-		Title: "Team Assignment",
-		Description: fmt.Sprintf(
-			"Greetings! You have reached the team assignment channel! " +
-				"To get access to the digital venue, select a team using the `/team` command. " +
-				"The Bot will then assign you and grant you access to the rest of the server.",
-		),
-		Color:  colors.GREEN,
-		Footer: util.HelpEmbedFooter(),
-		Image:  nil, // TODO There should be an image here
-		Fields: []*dg.MessageEmbedField{
-			{
-				Name:  "Team List",
-				Value: desc.String(),
-			},
-		},
-	}
-
-	_, err := s.ChannelMessageSendEmbed(channelID, &embed)
-	util.ErrCheck(err, "[Setup] Failed sending role assignment message")
 }

@@ -122,7 +122,7 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 					},
 				},
 			)
-			sendRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
+			setupRoleAssignmentMessage(s, config.ServerConfig.RoleAssignmentChannelID)
 		default:
 		}
 	},
