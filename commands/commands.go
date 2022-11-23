@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"time"
+
 	"RoBOT/config"
 
 	dg "github.com/bwmarrin/discordgo"
@@ -88,6 +90,11 @@ var CommandHandlers = map[string]func(s *dg.Session, i *dg.InteractionCreate){
 				Data: &dg.InteractionResponseData{
 					Content: "Assigned you to team " + team.Name,
 				},
+			},
+		)
+		time.AfterFunc(
+			time.Second*5, func() {
+				s.InteractionResponseDelete(i.Interaction)
 			},
 		)
 	},
