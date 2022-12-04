@@ -29,6 +29,9 @@ func main() {
 	s, err := dg.New("Bot " + config.RoBotConfig.Token)
 	util.ErrCheck(err, "Error creating Discord session")
 
+	// Explicitly enable state cache
+	s.StateEnabled = true
+
 	// Add Handler for Ready events
 	s.AddHandler(handlers.Ready)
 
