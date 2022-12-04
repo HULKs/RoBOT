@@ -63,7 +63,7 @@ func main() {
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGTERM, os.Interrupt, os.Kill)
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	log.Println("Bot is now running.  Press CTRL-C to exit.")
 	// Wait here until CTRL-C or other term signal is received
 	<-sc
 
