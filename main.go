@@ -31,6 +31,8 @@ func main() {
 
 	// Explicitly enable state cache
 	s.StateEnabled = true
+	// Enable Intents
+	s.Identify.Intents = dg.IntentsAll
 
 	// Add Handler for Ready events
 	s.AddHandler(handlers.Ready)
