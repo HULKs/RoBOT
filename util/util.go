@@ -7,9 +7,9 @@ import (
 	"os"
 	"strconv"
 
-	"RoBOT/colors"
+	"github.com/HULKs/RoBOT/colors"
 
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 )
 
 // LoadJSON loads the json file into target
@@ -30,16 +30,16 @@ func ParseHexColor(hex string) (int, error) {
 
 // CreateRole creates a new role with the given properties.
 func CreateRole(
-	s *discordgo.Session, guildID, name, hexColor string, permissions int64,
+	s *dg.Session, guildID, name, hexColor string, permissions int64,
 	hoist, mentionable bool, configRef *string,
-) *discordgo.Role {
+) *dg.Role {
 	// Parse color
 	color, err := ParseHexColor(hexColor)
 	ErrCheck(err, "Failed to parse color from "+hexColor+" for role "+name)
 
 	// Create Role
 	role, err := s.GuildRoleCreate(
-		guildID, &discordgo.RoleParams{
+		guildID, &dg.RoleParams{
 			Name:        name,
 			Color:       &color,
 			Hoist:       &hoist,
@@ -64,14 +64,14 @@ func CreateRole(
 
 // CreateCategory creates a category with the given properties and returns the channel struct
 func CreateCategory(
-	s *discordgo.Session, guildID, name, topic string, permissionOverwrites []*discordgo.PermissionOverwrite,
+	s *dg.Session, guildID, name, topic string, permissionOverwrites []*dg.PermissionOverwrite,
 	logCategory, logUser string,
-) *discordgo.Channel {
+) *dg.Channel {
 	// Create category
 	category, err := s.GuildChannelCreateComplex(
-		guildID, discordgo.GuildChannelCreateData{
+		guildID, dg.GuildChannelCreateData{
 			Name:                 name,
-			Type:                 discordgo.ChannelTypeGuildCategory,
+			Type:                 dg.ChannelTypeGuildCategory,
 			Topic:                topic,
 			PermissionOverwrites: permissionOverwrites,
 		},
@@ -84,11 +84,11 @@ func CreateCategory(
 
 // CreateChannel creates a channel with the given properties and returns the channel
 func CreateChannel(
-	s *discordgo.Session, guildID, name, topic, parentID string, channelType discordgo.ChannelType,
-	permissionOverwrites []*discordgo.PermissionOverwrite, logCategory, logUser string,
-) *discordgo.Channel {
+	s *dg.Session, guildID, name, topic, parentID string, channelType dg.ChannelType,
+	permissionOverwrites []*dg.PermissionOverwrite, logCategory, logUser string,
+) *dg.Channel {
 	channel, err := s.GuildChannelCreateComplex(
-		guildID, discordgo.GuildChannelCreateData{
+		guildID, dg.GuildChannelCreateData{
 			Name:                 name,
 			Topic:                topic,
 			Type:                 channelType,
@@ -104,21 +104,21 @@ func CreateChannel(
 
 // PermOverwriteHideForAShowForB returns the PermissionOverwrites for channels
 // that should be visible for A, but not B
-func PermOverwriteHideForAShowForB(A, B string) []*discordgo.PermissionOverwrite {
-	return []*discordgo.PermissionOverwrite{
+func PermOverwriteHideForAShowForB(A, B string) []*dg.PermissionOverwrite {
+	return []*dg.PermissionOverwrite{
 		{
 			ID:   A,
-			Type: discordgo.PermissionOverwriteTypeRole,
-			Deny: discordgo.PermissionViewChannel |
-				discordgo.PermissionVoiceConnect,
+			Type: dg.PermissionOverwriteTypeRole,
+			Deny: dg.PermissionViewChannel |
+				dg.PermissionVoiceConnect,
 			Allow: 0,
 		},
 		{
 			ID:   B,
-			Type: discordgo.PermissionOverwriteTypeRole,
+			Type: dg.PermissionOverwriteTypeRole,
 			Deny: 0,
-			Allow: discordgo.PermissionViewChannel |
-				discordgo.PermissionVoiceConnect,
+			Allow: dg.PermissionViewChannel |
+				dg.PermissionVoiceConnect,
 		},
 	}
 }
@@ -137,13 +137,13 @@ func CheckMsgSend(err error, chName string) {
 
 // SendProtectedCommandEmbed sends a red Embed to the channel saying a user is using a
 // command in a protected channel
-func SendProtectedCommandEmbed(s *discordgo.Session, chID string) error {
+func SendProtectedCommandEmbed(s *dg.Session, chID string) error {
 	_, err := s.ChannelMessageSendEmbed(
-		chID, &discordgo.MessageEmbed{
+		chID, &dg.MessageEmbed{
 			Title: "You are trying to use a command in a protected channel. This command is reserved for meeting organizers. " +
 				"This incident will be reported.",
 			Color: colors.RED,
-			Footer: &discordgo.MessageEmbedFooter{
+			Footer: &dg.MessageEmbedFooter{
 				Text: "If you think this is an error, contact the RoBOT-Admins",
 			},
 		},
@@ -152,8 +152,8 @@ func SendProtectedCommandEmbed(s *discordgo.Session, chID string) error {
 }
 
 // HelpEmbedFooter returns a reference to the default "if you need help" embed footer
-func HelpEmbedFooter() *discordgo.MessageEmbedFooter {
-	return &discordgo.MessageEmbedFooter{
+func HelpEmbedFooter() *dg.MessageEmbedFooter {
+	return &dg.MessageEmbedFooter{
 		Text: "If you need help, contact the @Orga-Team or @RoBOT-Admin",
 	}
 }

@@ -4,9 +4,9 @@ import (
 	"log"
 	"strings"
 
-	"RoBOT/colors"
-	"RoBOT/config"
-	"RoBOT/util"
+	"github.com/HULKs/RoBOT/colors"
+	"github.com/HULKs/RoBOT/config"
+	"github.com/HULKs/RoBOT/util"
 
 	dg "github.com/bwmarrin/discordgo"
 )

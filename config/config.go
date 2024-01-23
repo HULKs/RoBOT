@@ -8,9 +8,9 @@ import (
 	"path"
 	"sort"
 
-	"RoBOT/util"
+	"github.com/HULKs/RoBOT/util"
 
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 )
 
 var (
@@ -95,7 +95,7 @@ func SaveTeamConfig() {
 
 // IsProtected returns true if channel or its parent is
 // contained in ServerConfig.ProtectedChannels
-func IsProtected(channel *discordgo.Channel) bool {
+func IsProtected(channel *dg.Channel) bool {
 	for ID, _ := range ServerConfig.ProtectedChannels {
 		if ID == channel.ID || ID == channel.ParentID {
 			return true
@@ -114,7 +114,7 @@ func (conf *BotConf) SanityCheck() bool {
 }
 
 // SanityCheck checks if the members of ServerConf have been set to valid values.
-func (conf *ServerConf) SanityCheck(s *discordgo.Session) bool {
+func (conf *ServerConf) SanityCheck(s *dg.Session) bool {
 	var err error
 
 	// Event Name

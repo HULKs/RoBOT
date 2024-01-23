@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"log"
 
-	"RoBOT/colors"
-	"RoBOT/config"
-	"RoBOT/util"
+	"github.com/HULKs/RoBOT/colors"
+	"github.com/HULKs/RoBOT/config"
+	"github.com/HULKs/RoBOT/util"
 
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 )
 
 // VoiceStateUpdate is called every time a user joins a voice channel,
 // but we only care about the magic meeting creation channel
-func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
+func VoiceStateUpdate(s *dg.Session, ev *dg.VoiceStateUpdate) {
 	// Ignore events caused by bot itself
 	if ev.UserID == s.State.User.ID {
 		return
@@ -35,9 +35,9 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 	// Create new category and new text and voice channel
 	log.Printf("[VoiceStateUpdate] Creating new meeting for user %s", user.Username)
 	catNew, err := s.GuildChannelCreateComplex(
-		g.ID, discordgo.GuildChannelCreateData{
+		g.ID, dg.GuildChannelCreateData{
 			Name:     "New Meeting",
-			Type:     discordgo.ChannelTypeGuildCategory,
+			Type:     dg.ChannelTypeGuildCategory,
 			Position: catArchive.Position - 1,
 			PermissionOverwrites: append(
 				// Hide for @everyone, Default permissions for @Participant
@@ -46,11 +46,11 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 					config.ServerConfig.ParticipantRoleID,
 				),
 				// Add management permissions for meeting organizer
-				&discordgo.PermissionOverwrite{
+				&dg.PermissionOverwrite{
 					ID:    ev.UserID,
-					Type:  discordgo.PermissionOverwriteTypeMember,
+					Type:  dg.PermissionOverwriteTypeMember,
 					Deny:  0,
-					Allow: discordgo.PermissionManageChannels,
+					Allow: dg.PermissionManageChannels,
 				},
 			),
 		},
@@ -58,20 +58,20 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 
 	// Create Text channel and Voice channel
 	newChannel := util.CreateChannel(
-		s, g.ID, "text", "", catNew.ID, discordgo.ChannelTypeGuildText, nil, "VoiceStateUpdate", user.Mention(),
+		s, g.ID, "text", "", catNew.ID, dg.ChannelTypeGuildText, nil, "VoiceStateUpdate", user.Mention(),
 	)
 	chVoice := util.CreateChannel(
-		s, g.ID, "voice", "", catNew.ID, discordgo.ChannelTypeGuildVoice, nil, "VoiceStateUpdate", user.Mention(),
+		s, g.ID, "voice", "", catNew.ID, dg.ChannelTypeGuildVoice, nil, "VoiceStateUpdate", user.Mention(),
 	)
 
 	// TODO Add more commands
 	// Send welcome message
 	_, err = s.ChannelMessageSendEmbed(
-		newChannel.ID, &discordgo.MessageEmbed{
+		newChannel.ID, &dg.MessageEmbed{
 			Title:       "Modify your channels with the following commands:",
 			Description: "To use these, you need the \"Manage Channels\" permission in this category. As creator of the meeting, this is the case.",
 			Color:       colors.GREEN,
-			Footer: &discordgo.MessageEmbedFooter{
+			Footer: &dg.MessageEmbedFooter{
 				Text: "For questions regarding the Bot, contact the RoBOT-Admins.",
 			},
 			Image:     nil,
@@ -79,7 +79,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 			Video:     nil,
 			Provider:  nil,
 			Author:    nil,
-			Fields: []*discordgo.MessageEmbedField{
+			Fields: []*dg.MessageEmbedField{
 				{
 					Name:   fmt.Sprintf("`%srename`", config.RoBotConfig.Prefix),
 					Value:  "With the rename command, you can conveniently rename all channels belonging to your meeting at once.",
@@ -111,7 +111,7 @@ func VoiceStateUpdate(s *discordgo.Session, ev *discordgo.VoiceStateUpdate) {
 }
 
 // Ready is called when receiving the "ready" event
-func Ready(s *discordgo.Session, _ *discordgo.Ready) {
+func Ready(s *dg.Session, _ *dg.Ready) {
 	// Set the playing status
 	err := s.UpdateGameStatus(0, "with gophers...")
 	util.ErrCheck(err, "Failed setting custom status")

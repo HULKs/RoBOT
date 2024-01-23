@@ -7,10 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"RoBOT/commands"
-	"RoBOT/config"
-	"RoBOT/handlers"
-	"RoBOT/util"
+	"github.com/HULKs/RoBOT/commands"
+	"github.com/HULKs/RoBOT/config"
+	"github.com/HULKs/RoBOT/handlers"
+	"github.com/HULKs/RoBOT/util"
 
 	dg "github.com/bwmarrin/discordgo"
 )

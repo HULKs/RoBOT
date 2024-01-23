@@ -3,7 +3,7 @@ package commands
 import (
 	"time"
 
-	"RoBOT/config"
+	"github.com/HULKs/RoBOT/config"
 
 	dg "github.com/bwmarrin/discordgo"
 )
