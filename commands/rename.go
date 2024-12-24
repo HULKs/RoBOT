@@ -58,10 +58,11 @@ func renameChannel(s *dg.Session, i *dg.Interaction, newName string) {
 	util.ErrCheck(err, "[Rename] Failed getting parent category")
 
 	// Rename parent category
+	pos := catArchive.Position - 1
 	_, err = s.ChannelEditComplex(
 		parent.ID, &dg.ChannelEdit{
 			Name:     newName,
-			Position: catArchive.Position - 1,
+			Position: &pos,
 		},
 	)
 	util.ErrCheck(err, "[Rename] Failed renaming category")
